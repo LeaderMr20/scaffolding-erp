@@ -3,9 +3,48 @@ include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
-// ── Add ──────────────────────────────────────────────
+// Auto-create & seed expense_categories table
+$conn->query("CREATE TABLE IF NOT EXISTS expense_categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    sort_order INT DEFAULT 0
+)");
+if ($conn->query("SELECT COUNT(*) c FROM expense_categories")->fetch_assoc()['c'] == 0) {
+    $defaultCats = ['وقود ومحروقات','صيانة المعدات والسقالات','إيجار مستودع','رواتب وأجور',
+        'نقل وشحن','كهرباء وماء','قطع غيار وتوريدات','تأمين',
+        'اتصالات وإنترنت','مستلزمات مكتبية','رسوم حكومية وتراخيص','صيانة سيارات','مصاريف متنوعة'];
+    foreach ($defaultCats as $i => $name) {
+        $n = $conn->real_escape_string($name);
+        $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$n', " . ($i+1) . ")");
+    }
+}
+
+// ── Manage Categories ─────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_cat') {
+    $name = $conn->real_escape_string(trim($_POST['cat_name']));
+    if ($name) {
+        $ord = (int)$conn->query("SELECT COALESCE(MAX(sort_order),0)+1 v FROM expense_categories")->fetch_assoc()['v'];
+        $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$name', $ord)");
+    }
+    header('Location: index.php?tab=cats');
+    exit;
+}
+if (isset($_GET['del_cat'])) {
+    $conn->query("DELETE FROM expense_categories WHERE id=" . (int)$_GET['del_cat']);
+    header('Location: index.php?tab=cats');
+    exit;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_cat') {
+    $id   = (int)$_POST['cat_id'];
+    $name = $conn->real_escape_string(trim($_POST['cat_name']));
+    if ($name) $conn->query("UPDATE expense_categories SET name='$name' WHERE id=$id");
+    header('Location: index.php?tab=cats');
+    exit;
+}
+
+// ── Add Expense ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
-    $title = $conn->real_escape_string(trim($_POST['title']));
+    $title  = $conn->real_escape_string(trim($_POST['title']));
     $amount = (float)$_POST['amount'];
     $date   = $conn->real_escape_string($_POST['expense_date']);
     $conn->query("INSERT INTO expenses(title, amount, expense_date) VALUES('$title', $amount, '$date')");
@@ -13,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
     exit;
 }
 
-// ── Edit ─────────────────────────────────────────────
+// ── Edit Expense ──────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
     $id     = (int)$_POST['id'];
     $title  = $conn->real_escape_string(trim($_POST['title']));
@@ -24,23 +63,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
     exit;
 }
 
-// ── Delete ───────────────────────────────────────────
+// ── Delete Expense ────────────────────────────────
 if (isset($_GET['del'])) {
-    $id = (int)$_GET['del'];
-    $conn->query("DELETE FROM expenses WHERE id=$id");
+    $conn->query("DELETE FROM expenses WHERE id=" . (int)$_GET['del']);
     header('Location: index.php?ok=deleted&month=' . ($_GET['month'] ?? date('Y-m')));
     exit;
 }
 
-// ── Filter & Stats ───────────────────────────────────
+// ── Data ──────────────────────────────────────────
 $month = $_GET['month'] ?? date('Y-m');
 [$y, $m] = explode('-', $month);
 $where = "WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m";
 
-$expenses = $conn->query("SELECT * FROM expenses $where ORDER BY expense_date DESC, id DESC");
+$expenses   = $conn->query("SELECT * FROM expenses $where ORDER BY expense_date DESC, id DESC");
 $totalMonth = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses $where")->fetch_assoc()['s'];
 $totalAll   = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses")->fetch_assoc()['s'];
 $countMonth = (int)$conn->query("SELECT COUNT(*) c FROM expenses $where")->fetch_assoc()['c'];
+$categories = $conn->query("SELECT * FROM expense_categories ORDER BY sort_order, name");
+$cats = [];
+while ($c = $categories->fetch_assoc()) $cats[] = $c;
+
+$activeTab = $_GET['tab'] ?? 'list';
 
 include '../../templates/header.php';
 ?>
@@ -51,9 +94,14 @@ include '../../templates/header.php';
     <h4><i class="bi bi-wallet2 text-danger me-2"></i>المصروفات</h4>
     <p>تسجيل ومتابعة مصروفات المنشأة</p>
   </div>
-  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-    <i class="bi bi-plus-lg me-1"></i> إضافة مصروف
-  </button>
+  <div class="d-flex gap-2">
+    <a href="?tab=cats" class="btn btn-outline-secondary <?= $activeTab==='cats' ? 'active' : '' ?>">
+      <i class="bi bi-tags me-1"></i> إدارة الفئات
+    </a>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+      <i class="bi bi-plus-lg me-1"></i> إضافة مصروف
+    </button>
+  </div>
 </div>
 
 <!-- Alerts -->
@@ -65,6 +113,82 @@ include '../../templates/header.php';
   <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
 </div>
 <?php endif; ?>
+
+<?php if ($activeTab === 'cats'): ?>
+<!-- ══════════ CATEGORIES TAB ══════════ -->
+<div class="row g-4">
+  <!-- Add category -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-plus-circle me-2 text-primary"></i>إضافة فئة جديدة</div>
+      <div class="card-body">
+        <form method="post">
+          <input type="hidden" name="action" value="add_cat">
+          <div class="mb-3">
+            <label class="form-label fw-bold">اسم الفئة</label>
+            <input type="text" name="cat_name" class="form-control" placeholder="مثال: وقود" required>
+          </div>
+          <button class="btn btn-primary w-100"><i class="bi bi-save me-1"></i> حفظ</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- List categories -->
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-tags me-2 text-secondary"></i>قائمة الفئات</span>
+        <span class="badge bg-secondary"><?= count($cats) ?> فئة</span>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم الفئة</th>
+              <th style="width:130px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($cats as $i => $cat): ?>
+            <tr>
+              <td class="text-muted"><?= $i + 1 ?></td>
+              <td class="fw-bold"><?= htmlspecialchars($cat['name']) ?></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-outline-primary"
+                          onclick="openEditCat(<?= $cat['id'] ?>, '<?= addslashes(htmlspecialchars($cat['name'])) ?>')"
+                          title="تعديل">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <a href="?del_cat=<?= $cat['id'] ?>&tab=cats"
+                     class="btn btn-sm btn-outline-danger"
+                     onclick="return confirm('هل تريد حذف هذه الفئة؟')"
+                     title="حذف">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php if (empty($cats)): ?>
+            <tr><td colspan="3" class="text-center text-muted py-4">لا توجد فئات بعد</td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="mt-3">
+      <a href="index.php" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-right me-1"></i> العودة للمصروفات
+      </a>
+    </div>
+  </div>
+</div>
+
+<?php else: ?>
+<!-- ══════════ EXPENSES TAB ══════════ -->
 
 <!-- Stat Cards -->
 <div class="row g-3 mb-4">
@@ -114,7 +238,7 @@ include '../../templates/header.php';
       <thead>
         <tr>
           <th style="width:50px">#</th>
-          <th>الوصف</th>
+          <th>الوصف / الفئة</th>
           <th style="width:180px">المبلغ</th>
           <th style="width:150px">التاريخ</th>
           <th style="width:110px"></th>
@@ -132,19 +256,14 @@ include '../../templates/header.php';
               <?= number_format($row['amount'], 2) ?> ر.س
             </span>
           </td>
-          <td>
-            <i class="bi bi-calendar3 me-1 text-muted"></i>
-            <?= $row['expense_date'] ?>
-          </td>
+          <td><i class="bi bi-calendar3 me-1 text-muted"></i><?= $row['expense_date'] ?></td>
           <td>
             <div class="d-flex gap-1">
-              <!-- Edit button -->
               <button class="btn btn-sm btn-outline-primary"
                       onclick="openEdit(<?= $row['id'] ?>, '<?= addslashes(htmlspecialchars($row['title'])) ?>', <?= $row['amount'] ?>, '<?= $row['expense_date'] ?>')"
                       title="تعديل">
                 <i class="bi bi-pencil"></i>
               </button>
-              <!-- Delete button -->
               <a href="?del=<?= $row['id'] ?>&month=<?= urlencode($month) ?>"
                  class="btn btn-sm btn-outline-danger"
                  onclick="return confirm('هل تريد حذف هذا المصروف؟')"
@@ -181,6 +300,8 @@ include '../../templates/header.php';
   </div>
 </div>
 
+<?php endif; ?>
+
 <!-- ── Add Modal ─────────────────────────────────── -->
 <div class="modal fade" id="addModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -193,8 +314,18 @@ include '../../templates/header.php';
         <input type="hidden" name="action" value="add">
         <div class="modal-body p-4">
           <div class="mb-3">
-            <label class="form-label fw-bold">وصف المصروف <span class="text-danger">*</span></label>
-            <input type="text" name="title" class="form-control" placeholder="مثال: وقود، إيجار مستودع..." required>
+            <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control" list="catSuggestions"
+                   placeholder="اختر من القائمة أو اكتب وصفاً..." required autocomplete="off">
+            <datalist id="catSuggestions">
+              <?php foreach ($cats as $cat): ?>
+              <option value="<?= htmlspecialchars($cat['name']) ?>">
+              <?php endforeach; ?>
+            </datalist>
+            <div class="form-text">
+              <i class="bi bi-lightbulb me-1 text-warning"></i>
+              اختر من الفئات الجاهزة أو اكتب وصفاً مخصصاً
+            </div>
           </div>
           <div class="row g-3">
             <div class="col-6">
@@ -218,7 +349,7 @@ include '../../templates/header.php';
   </div>
 </div>
 
-<!-- ── Edit Modal ────────────────────────────────── -->
+<!-- ── Edit Expense Modal ─────────────────────────── -->
 <div class="modal fade" id="editModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:16px;border:none">
@@ -231,8 +362,8 @@ include '../../templates/header.php';
         <input type="hidden" name="id" id="editId">
         <div class="modal-body p-4">
           <div class="mb-3">
-            <label class="form-label fw-bold">وصف المصروف <span class="text-danger">*</span></label>
-            <input type="text" name="title" id="editTitle" class="form-control" required>
+            <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
+            <input type="text" name="title" id="editTitle" class="form-control" list="catSuggestions" required autocomplete="off">
           </div>
           <div class="row g-3">
             <div class="col-6">
@@ -256,6 +387,32 @@ include '../../templates/header.php';
   </div>
 </div>
 
+<!-- ── Edit Category Modal ───────────────────────── -->
+<div class="modal fade" id="editCatModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content" style="border-radius:16px;border:none">
+      <div class="modal-header" style="background:#374151;color:#fff;border-radius:16px 16px 0 0">
+        <h5 class="modal-title"><i class="bi bi-tag me-2"></i>تعديل الفئة</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post">
+        <input type="hidden" name="action" value="edit_cat">
+        <input type="hidden" name="cat_id" id="editCatId">
+        <div class="modal-body p-4">
+          <label class="form-label fw-bold">اسم الفئة</label>
+          <input type="text" name="cat_name" id="editCatName" class="form-control" required>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4">
+            <i class="bi bi-check-lg me-1"></i> حفظ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 function openEdit(id, title, amount, date) {
     document.getElementById('editId').value     = id;
@@ -263,6 +420,11 @@ function openEdit(id, title, amount, date) {
     document.getElementById('editAmount').value = amount;
     document.getElementById('editDate').value   = date;
     new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+function openEditCat(id, name) {
+    document.getElementById('editCatId').value   = id;
+    document.getElementById('editCatName').value = name;
+    new bootstrap.Modal(document.getElementById('editCatModal')).show();
 }
 </script>
 
