@@ -2,9 +2,13 @@
 include '../../config/db.php';
 
 if (isset($_GET['close'])) {
+    $cid = (int)$_GET['close'];
     $stmt = $conn->prepare("UPDATE contracts SET status='closed' WHERE id=?");
-    $stmt->bind_param('i', $_GET['close']);
+    $stmt->bind_param('i', $cid);
     $stmt->execute();
+    $st2 = $conn->prepare("UPDATE invoices SET status='cancelled' WHERE contract_id=?");
+    $st2->bind_param('i', $cid);
+    $st2->execute();
     header('Location: index.php');
     exit;
 }
@@ -15,6 +19,7 @@ if (isset($_GET['del'])) {
     $id = (int)$_GET['del'];
     $conn->query("DELETE FROM contract_items WHERE contract_id=$id");
     $conn->query("DELETE FROM payments WHERE contract_id=$id");
+    $conn->query("UPDATE invoices SET status='cancelled' WHERE contract_id=$id");
     $conn->query("DELETE FROM contracts WHERE id=$id");
     header('Location: index.php');
     exit;

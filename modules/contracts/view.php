@@ -55,6 +55,13 @@ include '../../templates/header.php';
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h4><i class="bi bi-file-earmark-text text-warning me-2"></i> العقد رقم #<?= $id ?></h4>
   <div class="d-flex gap-2">
+    <?php
+    $inv = $conn->query("SELECT id FROM invoices WHERE contract_id=$id LIMIT 1")->fetch_assoc();
+    if ($inv): ?>
+    <a href="../invoices/view.php?id=<?= $inv['id'] ?>" class="btn btn-outline-success" target="_blank">
+      <i class="bi bi-receipt-cutoff me-1"></i> الفاتورة
+    </a>
+    <?php endif; ?>
     <a href="print.php?id=<?= $id ?>" class="btn btn-outline-secondary" target="_blank">
       <i class="bi bi-printer me-1"></i> طباعة
     </a>

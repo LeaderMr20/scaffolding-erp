@@ -416,8 +416,9 @@ body.sidebar-collapsed .sb-footer {
 }
 .page-header p { color: var(--text-muted); font-size: 14px; margin: 6px 0 0; font-weight: 500; }
 
-/* Fix Bootstrap RTL select option visibility */
-select option { color: #1e293b !important; background: #ffffff !important; }
+/* Fix Bootstrap RTL select option visibility and text clipping */
+select { direction: rtl !important; text-align: right !important; text-align-last: right !important; }
+select option { color: #1e293b !important; background: #ffffff !important; direction: rtl !important; text-align: right !important; unicode-bidi: embed !important; }
 
 /* ─── MOBILE & RESPONSIVE ────────────────────── */
 .sb-overlay {
@@ -501,6 +502,12 @@ select option { color: #1e293b !important; background: #ffffff !important; }
   <p class="sb-section">المالية</p>
   <ul class="sb-nav">
     <li>
+      <a href="<?= $base ?>modules/invoices/index.php" class="<?= isActive('/invoices/') ?>" title="الفواتير">
+        <div class="nav-icon"><i class="bi bi-receipt-cutoff"></i></div>
+        <div class="nav-text">الفواتير الإلكترونية</div>
+      </a>
+    </li>
+    <li>
       <a href="<?= $base ?>modules/payments/index.php" class="<?= isActive('/payments/') ?>" title="المدفوعات">
         <div class="nav-icon"><i class="bi bi-cash-stack"></i></div>
         <div class="nav-text">المدفوعات</div>
@@ -527,6 +534,12 @@ select option { color: #1e293b !important; background: #ffffff !important; }
   <?php if (isAdmin()): ?>
   <p class="sb-section">الإدارة</p>
   <ul class="sb-nav">
+    <li>
+      <a href="<?= $base ?>modules/settings/index.php" class="<?= isActive('/settings/') ?>" title="إعدادات الشركة">
+        <div class="nav-icon"><i class="bi bi-gear-fill"></i></div>
+        <div class="nav-text">إعدادات الشركة</div>
+      </a>
+    </li>
     <li>
       <a href="<?= $base ?>register.php" class="<?= isActive('register.php') ?>" title="إنشاء مستخدم">
         <div class="nav-icon"><i class="bi bi-person-plus-fill"></i></div>

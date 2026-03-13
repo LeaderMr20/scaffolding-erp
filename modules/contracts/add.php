@@ -39,6 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Auto-generate invoice
+    $year = date('Y');
+    $seq  = $conn->query("SELECT COUNT(*) c FROM invoices WHERE YEAR(issue_date)=$year")->fetch_assoc()['c'] + 1;
+    $inv_number = 'FAT-' . $year . '-' . str_pad($seq, 4, '0', STR_PAD_LEFT);
+    $inv_date   = date('Y-m-d');
+    $inv_stmt   = $conn->prepare("INSERT INTO invoices(invoice_number, contract_id, issue_date, total) VALUES(?,?,?,?)");
+    $inv_stmt->bind_param('sisd', $inv_number, $contract_id, $inv_date, $total);
+    $inv_stmt->execute();
+
     header('Location: view.php?id=' . $contract_id . '&new=1');
     exit;
 }
@@ -53,6 +62,15 @@ while ($e = $equip_res->fetch_assoc()) {
 
 include '../../templates/header.php';
 ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css">
+<style>
+.ts-wrapper { direction: rtl; }
+.ts-wrapper .ts-control { border-radius: 8px !important; padding: 6px 10px !important; min-height: 38px; }
+.ts-wrapper .ts-dropdown { direction: rtl; text-align: right; }
+.ts-wrapper .ts-dropdown .option { padding: 8px 12px; }
+.ts-wrapper .ts-dropdown .option:hover, .ts-wrapper .ts-dropdown .option.active { background: #dbeafe; color: #1e293b; }
+.ts-wrapper .ts-control input { direction: rtl; text-align: right; }
+</style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
   <div>
@@ -70,7 +88,7 @@ include '../../templates/header.php';
       <div class="row g-3 mb-4">
         <div class="col-md-4">
           <label class="form-label fw-bold">العميل <span class="text-danger">*</span></label>
-          <select name="client_id" class="form-select" required>
+          <select name="client_id" id="clientSelect" required>
             <option value="">-- اختر العميل --</option>
             <?php while ($c = $clients->fetch_assoc()): ?>
             <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
@@ -108,7 +126,7 @@ include '../../templates/header.php';
           <tbody id="itemsBody">
             <tr class="item-row">
               <td>
-                <select name="equipment_id[]" class="form-select equip-select" onchange="fillPrice(this)">
+                <select name="equipment_id[]" class="equip-select">
                   <option value="">-- اختر المعدة --</option>
                   <?php foreach ($equip_list as $e): ?>
                   <option value="<?= $e['id'] ?>" data-price="<?= $e['price_day'] ?>">
@@ -152,9 +170,49 @@ include '../../templates/header.php';
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
 // Equipment data indexed by ID
 const equipData = <?= json_encode(array_column($equip_list, null, 'id')) ?>;
+
+// Build options array for Tom Select
+const equipOptions = [
+    {value: '', text: '-- اختر المعدة --'}
+].concat(Object.values(equipData).map(e => ({
+    value: String(e.id),
+    text: e.name,
+    price: e.price_day
+})));
+
+function initEquipSelect(el) {
+    const ts = new TomSelect(el, {
+        options: equipOptions,
+        items: [el.value || ''],
+        valueField: 'value',
+        labelField: 'text',
+        searchField: 'text',
+        placeholder: '-- اختر المعدة --',
+        allowEmptyOption: true,
+        create: false,
+        onChange: function(value) {
+            const row = el.closest('tr');
+            const priceInput = row.querySelector('.item-price');
+            priceInput.value = (value && equipData[value]) ? equipData[value].price_day : '';
+            calcRow(priceInput);
+        }
+    });
+    return ts;
+}
+
+// Init client select
+new TomSelect('#clientSelect', {
+    placeholder: '-- اختر العميل --',
+    allowEmptyOption: true,
+    create: false
+});
+
+// Init first row
+document.querySelectorAll('.equip-select').forEach(el => initEquipSelect(el));
 
 function getDays() {
     const s = document.getElementById('start_date').value;
@@ -167,21 +225,12 @@ function getDays() {
 }
 
 function updateDays() {
-    const days = getDays();
     const sd = document.getElementById('start_date').value;
     const ed = document.getElementById('end_date').value;
     if (sd && ed) {
-        document.getElementById('days_count').value = days + ' يوم';
+        document.getElementById('days_count').value = getDays() + ' يوم';
     }
     document.querySelectorAll('.item-price').forEach(p => calcRow(p));
-}
-
-function fillPrice(sel) {
-    const row = sel.closest('tr');
-    const eid = sel.value;
-    const priceInput = row.querySelector('.item-price');
-    priceInput.value = (eid && equipData[eid]) ? equipData[eid].price_day : '';
-    calcRow(priceInput);
 }
 
 function calcRow(input) {
@@ -201,13 +250,22 @@ function calcTotal() {
 
 function addRow() {
     const tbody = document.getElementById('itemsBody');
-    const first = tbody.querySelector('tr.item-row');
-    const clone = first.cloneNode(true);
-    clone.querySelector('.equip-select').value = '';
-    clone.querySelector('.item-qty').value = 1;
-    clone.querySelector('.item-price').value = '';
-    clone.querySelector('.row-total').value = '0.00';
-    tbody.appendChild(clone);
+    const tr = document.createElement('tr');
+    tr.className = 'item-row';
+    tr.innerHTML = `
+        <td>
+            <select name="equipment_id[]" class="equip-select"></select>
+        </td>
+        <td><input type="number" name="item_qty[]" class="form-control item-qty" value="1" min="1" onchange="calcRow(this)"></td>
+        <td><input type="number" name="item_price[]" class="form-control item-price" step="0.01" min="0" onchange="calcRow(this)"></td>
+        <td><input type="text" class="form-control row-total bg-light" readonly value="0.00"></td>
+        <td>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRow(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>`;
+    tbody.appendChild(tr);
+    initEquipSelect(tr.querySelector('.equip-select'));
 }
 
 function removeRow(btn) {

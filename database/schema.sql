@@ -47,6 +47,16 @@ phone VARCHAR(50),
 salary DECIMAL(10,2)
 );
 
+CREATE TABLE invoices(
+id INT AUTO_INCREMENT PRIMARY KEY,
+invoice_number VARCHAR(30) NOT NULL UNIQUE,
+contract_id INT NOT NULL,
+issue_date DATE NOT NULL,
+total DECIMAL(12,2) NOT NULL DEFAULT 0,
+status ENUM('active','cancelled') NOT NULL DEFAULT 'active',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE expenses(
 id INT AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(200),
