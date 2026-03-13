@@ -1,0 +1,13 @@
+# Credentials - do not commit production config
+config/db.php
+
+# XAMPP / local env
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp

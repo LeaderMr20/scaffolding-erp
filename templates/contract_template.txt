@@ -1,0 +1,26 @@
+
+SCaffolding Rental Contract
+
+Company Name: ___________________
+Logo: ___________________
+
+Client Name: ___________________
+Phone: ___________________
+
+Contract Start: ________
+Contract End: ________
+
+Equipment Table
+---------------------------------
+Item | Qty | Price | Total
+---------------------------------
+
+Total Contract Value: __________
+
+Terms
+1. Client responsible for damage.
+2. Equipment must be returned.
+3. Contract can be extended.
+
+Signature Company: __________
+Signature Client: __________
