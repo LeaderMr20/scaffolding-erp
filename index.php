@@ -45,10 +45,10 @@ $overdue = $conn->query("
 // 4. Contracts with unpaid balance > 0
 $unpaid = $conn->query("
     SELECT c.id, c.total, cl.name client_name,
-           COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0) paid
+           COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0) AS paid
     FROM contracts c JOIN clients cl ON c.client_id=cl.id
     WHERE c.status='active'
-    HAVING (c.total - paid) > 0
+    HAVING paid < c.total
     ORDER BY (c.total - paid) DESC
     LIMIT 5
 ");
@@ -149,8 +149,9 @@ if ($expThisMonth == 0) {
   </div>
   <?php if (!empty($alerts)): ?>
   <div>
+    <?php $hasDanger = count(array_filter($alerts, function($a){ return $a['level']==='danger'; })) > 0; ?>
     <span class="badge rounded-pill"
-          style="background:<?= count(array_filter($alerts, fn($a)=>$a['level']==='danger')) > 0 ? '#dc2626' : '#d97706' ?>;font-size:13px;padding:8px 16px">
+          style="background:<?= $hasDanger ? '#dc2626' : '#d97706' ?>;font-size:13px;padding:8px 16px">
       <i class="bi bi-bell-fill me-1"></i>
       <?= count($alerts) ?> تنبيه<?= count($alerts) > 1 ? 'ات' : '' ?>
     </span>
