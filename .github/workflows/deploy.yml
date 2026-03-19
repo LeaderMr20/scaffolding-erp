@@ -101,6 +101,17 @@ jobs:
               }
           }
 
+          // Fix charset on all text columns to utf8mb4
+          $conn->query("ALTER TABLE payments   MODIFY method      VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE clients    MODIFY name        VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE clients    MODIFY address     TEXT        CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE equipment  MODIFY name        VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE contracts  MODIFY status      VARCHAR(50)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE expenses   MODIFY title       VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          $conn->query("ALTER TABLE employees  MODIFY name        VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+          // Fix corrupted '????' payment methods (Latin1 inserted as question marks)
+          $conn->query("UPDATE payments SET method='نقدي' WHERE method LIKE '?%' OR method=''");
+
           // Ensure admin user exists (by username, not by count)
           $adminExists = $conn->query("SELECT id FROM users WHERE username='admin' LIMIT 1");
           if ($adminExists && $adminExists->num_rows === 0) {
