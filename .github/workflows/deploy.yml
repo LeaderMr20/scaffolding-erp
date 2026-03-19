@@ -121,21 +121,27 @@ jobs:
               sort_order INT DEFAULT 0
           ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
-          // ── One-time charset migration (runs once via settings flag) ───────
-          $mig = $conn->query("SELECT setting_value FROM settings WHERE setting_key='charset_migrated' LIMIT 1");
+          // ── One-time charset migration v3 (flag-based, runs once) ───────────
+          $mig = $conn->query("SELECT setting_value FROM settings WHERE setting_key='charset_v3' LIMIT 1");
           if (!$mig || $mig->num_rows === 0) {
+              // Convert ALL tables to utf8mb4
               $tables = ['clients','equipment','contracts','contract_items','payments',
                          'employees','expenses','expense_categories','settings','users','invoices'];
               foreach ($tables as $t) {
                   $conn->query("ALTER TABLE `$t` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
               }
-              // Fix corrupted Arabic data stored as '????'
+              // Repair corrupted Arabic rows (stored as '????' in latin1)
               $conn->query("UPDATE payments SET method='نقدي' WHERE method LIKE '?%' OR method=''");
               $conn->query("UPDATE users SET full_name='مدير النظام' WHERE full_name LIKE '?%' OR full_name=''");
-              $conn->query("UPDATE clients SET name='' WHERE name LIKE '?%'");
-              $conn->query("UPDATE equipment SET name='' WHERE name LIKE '?%'");
-              $conn->query("UPDATE expenses SET title='' WHERE title LIKE '?%'");
-              $conn->query("INSERT IGNORE INTO settings(setting_key,setting_value) VALUES('charset_migrated','1')");
+              $conn->query("UPDATE clients SET name=CONCAT('عميل-',id) WHERE name LIKE '?%' OR name=''");
+              $conn->query("UPDATE equipment SET name=CONCAT('معدة-',id) WHERE name LIKE '?%' OR name=''");
+              $conn->query("UPDATE expenses SET title='مصروف' WHERE title LIKE '?%' OR title=''");
+              $conn->query("UPDATE expense_categories SET name=CONCAT('فئة-',id) WHERE name LIKE '?%' OR name=''");
+              // Repair settings
+              $conn->query("UPDATE settings SET setting_value='مؤسسة الجود للسقالات' WHERE setting_key='company_name' AND (setting_value LIKE '?%' OR setting_value='')");
+              $conn->query("UPDATE settings SET setting_value='314325455800012'       WHERE setting_key='vat_number'    AND (setting_value LIKE '?%' OR setting_value='')");
+              $conn->query("UPDATE settings SET setting_value=''                      WHERE setting_key IN ('company_address','company_phone','commercial_registration') AND setting_value LIKE '?%'");
+              $conn->query("INSERT IGNORE INTO settings(setting_key,setting_value) VALUES('charset_v3','1')");
           }
 
           // ── Default settings ───────────────────────────────────────────────
