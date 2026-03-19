@@ -101,6 +101,14 @@ jobs:
               }
           }
 
+          // Seed default admin user if no users exist
+          $uc = $conn->query("SELECT COUNT(*) c FROM users");
+          if ($uc && (int)$uc->fetch_assoc()['c'] === 0) {
+              $hash = password_hash('admin123', PASSWORD_DEFAULT);
+              $hash = $conn->real_escape_string($hash);
+              $conn->query("INSERT INTO users(full_name, username, password, role) VALUES('مدير النظام', 'admin', '$hash', 'admin')");
+          }
+
           if (!function_exists('getSetting')) {
               function getSetting($conn, $key) {
                   $k   = $conn->real_escape_string($key);
