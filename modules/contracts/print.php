@@ -36,8 +36,9 @@ $days     = max(1, (strtotime($contract['end_date']) - strtotime($contract['star
   .company-header { border-bottom: 3px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
   .signature-box { border-top: 1px solid #000; margin-top: 50px; padding-top: 10px; text-align: center; }
   @media print {
+    @page { margin: 0; size: A4; }
     .no-print { display: none !important; }
-    body { padding: 15px; }
+    body { padding: 20px; }
   }
 </style>
 </head>
