@@ -100,31 +100,31 @@ body.sidebar-collapsed #main { margin-right: var(--sidebar-collapsed-width); }
 
 /* Brand */
 .sb-brand {
-  display: flex; align-items: center; gap: 12px;
-  padding: 18px 16px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 22px 18px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
-  min-height: var(--topbar-h);
+  min-height: 80px;
   transition: var(--transition);
   white-space: nowrap;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.025);
 }
-body.sidebar-collapsed .sb-brand { padding: 18px 14px; justify-content: center; }
+body.sidebar-collapsed .sb-brand { padding: 20px 14px; justify-content: center; }
 body.sidebar-collapsed .logo-text { opacity: 0; width: 0; display: none; }
 
 .sb-brand .logo-icon {
-  width: 42px; height: 42px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-radius: 12px;
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 19px; color: #fff;
+  font-size: 22px; color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(59,130,246,0.5);
+  box-shadow: 0 6px 20px rgba(59,130,246,0.55);
   transition: var(--transition);
 }
-body.sidebar-collapsed .sb-brand .logo-icon { width: 38px; height: 38px; font-size: 16px; }
+body.sidebar-collapsed .sb-brand .logo-icon { width: 40px; height: 40px; font-size: 18px; }
 .sb-brand .logo-text { transition: var(--transition); }
-.sb-brand .logo-text strong { display: block; font-size: 15px; font-weight: 800; line-height: 1.3; color: #f1f5f9; }
-.sb-brand .logo-text span { font-size: 11px; color: #4a6080; font-weight: 600; letter-spacing: 0.5px; }
+.sb-brand .logo-text strong { display: block; font-size: 17px; font-weight: 900; line-height: 1.3; color: #f8fafc; letter-spacing: 0.3px; }
+.sb-brand .logo-text span { font-size: 12px; color: #60a5fa; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
 
 /* Nav sections */
 .sb-section {
