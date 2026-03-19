@@ -1,13 +1,15 @@
 <?php
 include '../../config/db.php';
-include '../../templates/header.php';
+require_once '../../config/auth.php';
 requireAdmin();
+include '../../templates/header.php';
 
 $msg = '';
 $msgType = 'success';
+$canEdit = true;
 
 // ── Delete user ────────────────────────────────────────────────────────────
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+if ($canEdit && isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $del = (int)$_GET['delete'];
     if ($del === ($_SESSION['user_id'] ?? 0)) {
         $msg = 'لا يمكنك حذف حسابك الخاص.';
@@ -19,7 +21,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 }
 
 // ── Edit user (POST) ───────────────────────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id'])) {
+if ($canEdit && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id'])) {
     $eid       = (int)$_POST['edit_id'];
     $full_name = trim($_POST['full_name'] ?? '');
     $username  = trim($_POST['username']  ?? '');
@@ -58,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id'])) {
 }
 
 // ── Add user (POST) ────────────────────────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
+if ($canEdit && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
     $full_name = trim($_POST['full_name'] ?? '');
     $username  = trim($_POST['username']  ?? '');
     $password  = $_POST['password'] ?? '';
@@ -104,9 +106,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     <h4><i class="bi bi-people-fill me-2 text-primary"></i>إدارة المستخدمين</h4>
     <p>إضافة وتعديل وحذف حسابات النظام</p>
   </div>
+  <?php if ($canEdit): ?>
   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
     <i class="bi bi-person-plus-fill me-1"></i> مستخدم جديد
   </button>
+  <?php endif; ?>
 </div>
 
 <?php if ($msg): ?>
