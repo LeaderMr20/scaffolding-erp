@@ -541,9 +541,9 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
       </a>
     </li>
     <li>
-      <a href="<?= $base ?>register.php" class="<?= isActive('register.php') ?>" title="إنشاء مستخدم">
-        <div class="nav-icon"><i class="bi bi-person-plus-fill"></i></div>
-        <div class="nav-text">إنشاء مستخدم</div>
+      <a href="<?= $base ?>modules/users/index.php" class="<?= isActive('/users/') ?>" title="إدارة المستخدمين">
+        <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
+        <div class="nav-text">إدارة المستخدمين</div>
       </a>
     </li>
   </ul>
