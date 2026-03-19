@@ -3,20 +3,22 @@ include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
-// Auto-create & seed expense_categories table
+// Auto-create expense_categories table
 $conn->query("CREATE TABLE IF NOT EXISTS expense_categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     sort_order INT DEFAULT 0
 )");
-if ($conn->query("SELECT COUNT(*) c FROM expense_categories")->fetch_assoc()['c'] == 0) {
-    $defaultCats = ['وقود ومحروقات','صيانة المعدات والسقالات','إيجار مستودع','رواتب وأجور',
-        'نقل وشحن','كهرباء وماء','قطع غيار وتوريدات','تأمين',
-        'اتصالات وإنترنت','مستلزمات مكتبية','رسوم حكومية وتراخيص','صيانة سيارات','مصاريف متنوعة'];
-    foreach ($defaultCats as $i => $name) {
+
+// Migration v2: replace old categories with new standard set
+if (!function_exists('getSetting') || !getSetting($conn, 'cats_v2')) {
+    $newCats = ['إيجار','أجور ورواتب','نثريات','مصاريف تشغيل','كهرباء','ماء','مشتريات','أخرى'];
+    $conn->query("TRUNCATE TABLE expense_categories");
+    foreach ($newCats as $i => $name) {
         $n = $conn->real_escape_string($name);
         $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$n', " . ($i+1) . ")");
     }
+    $conn->query("INSERT INTO settings(name,value) VALUES('cats_v2','1') ON DUPLICATE KEY UPDATE value='1'");
 }
 
 // ── Manage Categories ─────────────────────────────
@@ -87,6 +89,10 @@ $activeTab = $_GET['tab'] ?? 'list';
 
 include '../../templates/header.php';
 ?>
+
+<style>
+select.form-select { font-family: 'Cairo', sans-serif; }
+</style>
 
 <!-- Page header -->
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -315,16 +321,15 @@ include '../../templates/header.php';
         <div class="modal-body p-4">
           <div class="mb-3">
             <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
-            <input type="text" name="title" class="form-control" list="catSuggestions"
-                   placeholder="اختر من القائمة أو اكتب وصفاً..." required autocomplete="off">
-            <datalist id="catSuggestions">
+            <select name="title" class="form-select" required>
+              <option value="" disabled selected>-- اختر الفئة --</option>
               <?php foreach ($cats as $cat): ?>
-              <option value="<?= htmlspecialchars($cat['name']) ?>">
+              <option value="<?= htmlspecialchars($cat['name']) ?>"><?= htmlspecialchars($cat['name']) ?></option>
               <?php endforeach; ?>
-            </datalist>
+            </select>
             <div class="form-text">
-              <i class="bi bi-lightbulb me-1 text-warning"></i>
-              اختر من الفئات الجاهزة أو اكتب وصفاً مخصصاً
+              <i class="bi bi-tags me-1 text-secondary"></i>
+              يمكنك إضافة فئات من <a href="?tab=cats">إدارة الفئات</a>
             </div>
           </div>
           <div class="row g-3">
@@ -363,7 +368,12 @@ include '../../templates/header.php';
         <div class="modal-body p-4">
           <div class="mb-3">
             <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
-            <input type="text" name="title" id="editTitle" class="form-control" list="catSuggestions" required autocomplete="off">
+            <select name="title" id="editTitle" class="form-select" required>
+              <option value="" disabled>-- اختر الفئة --</option>
+              <?php foreach ($cats as $cat): ?>
+              <option value="<?= htmlspecialchars($cat['name']) ?>"><?= htmlspecialchars($cat['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
           </div>
           <div class="row g-3">
             <div class="col-6">
@@ -416,9 +426,12 @@ include '../../templates/header.php';
 <script>
 function openEdit(id, title, amount, date) {
     document.getElementById('editId').value     = id;
-    document.getElementById('editTitle').value  = title;
     document.getElementById('editAmount').value = amount;
     document.getElementById('editDate').value   = date;
+    var sel = document.getElementById('editTitle');
+    for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === title) { sel.selectedIndex = i; break; }
+    }
     new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 function openEditCat(id, name) {

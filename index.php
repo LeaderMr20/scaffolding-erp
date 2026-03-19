@@ -25,23 +25,17 @@ $netProfit    = $totalRevenue - $totalExpense;
 // ── Smart Alerts Data ─────────────────────────────
 $today = date('Y-m-d');
 
-// 1. Contracts expiring in <= 7 days (critical)
+// 1. Contracts expiring in <= 5 days (critical)
 $expiring7 = $conn->query("
     SELECT c.id, c.end_date, c.total, cl.name client_name,
            DATEDIFF(c.end_date, CURDATE()) days_left
     FROM contracts c JOIN clients cl ON c.client_id=cl.id
-    WHERE c.status='active' AND c.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+    WHERE c.status='active' AND c.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 5 DAY)
     ORDER BY c.end_date ASC
 ");
 
-// 2. Contracts expiring in 8–30 days (warning)
-$expiring30 = $conn->query("
-    SELECT c.id, c.end_date, cl.name client_name,
-           DATEDIFF(c.end_date, CURDATE()) days_left
-    FROM contracts c JOIN clients cl ON c.client_id=cl.id
-    WHERE c.status='active' AND c.end_date BETWEEN DATE_ADD(CURDATE(), INTERVAL 8 DAY) AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-    ORDER BY c.end_date ASC
-");
+// 2. Disabled — no warning for 8-30 days range
+$expiring30 = null;
 
 // 3. Active contracts past end_date (overdue — not closed yet)
 $overdue = $conn->query("
@@ -104,19 +98,6 @@ if ($expiring7 && $expiring7->num_rows > 0) {
     }
 }
 
-// Expiring in 8–30 days (warning)
-if ($expiring30 && $expiring30->num_rows > 0) {
-    while ($r = $expiring30->fetch_assoc()) {
-        $alerts[] = [
-            'level' => 'warning',
-            'icon'  => 'bi-clock-history',
-            'title' => 'عقد يقترب موعد انتهائه',
-            'body'  => "عقد <strong>" . htmlspecialchars($r['client_name']) . "</strong> — ينتهي بعد <strong>{$r['days_left']} يوم</strong> ({$r['end_date']})",
-            'link'  => "modules/contracts/view.php?id={$r['id']}",
-            'link_text' => 'عرض',
-        ];
-    }
-}
 
 // Unpaid balances (info)
 if ($unpaid && $unpaid->num_rows > 0) {
@@ -389,7 +370,7 @@ if ($recent && $recent->num_rows > 0):
     while ($row = $recent->fetch_assoc()):
         $isActive  = $row['status'] == 'active';
         $daysLeft  = (int)$row['days_left'];
-        $isExpiring = $isActive && $daysLeft >= 0 && $daysLeft <= 7;
+        $isExpiring = $isActive && $daysLeft >= 0 && $daysLeft <= 5;
         $isOverdue  = $isActive && $daysLeft < 0;
 ?>
           <tr style="<?= $isOverdue ? 'background:#fef2f2' : ($isExpiring ? 'background:#fffbeb' : '') ?>">
