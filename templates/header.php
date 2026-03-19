@@ -81,7 +81,7 @@ body {
 #sidebar {
   width: var(--sidebar-width);
   min-height: 100vh;
-  background: var(--sidebar-bg);
+  background: linear-gradient(180deg, #0d1526 0%, #0a1020 60%, #080d18 100%);
   position: fixed;
   right: 0; top: 0; bottom: 0;
   z-index: 1000;
@@ -91,7 +91,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
-  border-left: 1px solid rgba(255,255,255,0.04);
+  border-left: 1px solid rgba(255,255,255,0.06);
 }
 #sidebar::-webkit-scrollbar { display: none; }
 
@@ -101,56 +101,57 @@ body.sidebar-collapsed #main { margin-right: var(--sidebar-collapsed-width); }
 /* Brand */
 .sb-brand {
   display: flex; align-items: center; gap: 12px;
-  padding: 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   min-height: var(--topbar-h);
   transition: var(--transition);
   white-space: nowrap;
+  background: rgba(255,255,255,0.02);
 }
-body.sidebar-collapsed .sb-brand { padding: 20px 16px; justify-content: center; }
+body.sidebar-collapsed .sb-brand { padding: 18px 14px; justify-content: center; }
 body.sidebar-collapsed .logo-text { opacity: 0; width: 0; display: none; }
 
 .sb-brand .logo-icon {
   width: 42px; height: 42px;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
   font-size: 19px; color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.45);
+  box-shadow: 0 4px 16px rgba(59,130,246,0.5);
   transition: var(--transition);
 }
 body.sidebar-collapsed .sb-brand .logo-icon { width: 38px; height: 38px; font-size: 16px; }
-.sb-brand .logo-text { color: var(--sidebar-white); transition: var(--transition); }
-.sb-brand .logo-text strong { display: block; font-size: 15px; font-weight: 800; line-height: 1.2; }
-.sb-brand .logo-text span { font-size: 11px; color: #475569; font-weight: 500; }
+.sb-brand .logo-text { transition: var(--transition); }
+.sb-brand .logo-text strong { display: block; font-size: 15px; font-weight: 800; line-height: 1.3; color: #f1f5f9; }
+.sb-brand .logo-text span { font-size: 11px; color: #4a6080; font-weight: 600; letter-spacing: 0.5px; }
 
 /* Nav sections */
 .sb-section {
-  padding: 20px 20px 6px;
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 1.8px;
+  padding: 18px 18px 5px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: #374151;
+  color: #2d4a6a;
   white-space: nowrap;
   transition: var(--transition);
 }
 body.sidebar-collapsed .sb-section { opacity: 0; height: 0; padding: 0; margin: 0; overflow: hidden; }
 
-.sb-nav { list-style: none; padding: 0 10px; }
+.sb-nav { list-style: none; padding: 0 8px; }
 .sb-nav li { margin-bottom: 2px; }
 .sb-nav a {
   display: grid;
-  grid-template-columns: 36px 1fr;
+  grid-template-columns: 38px 1fr;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  color: var(--sidebar-text);
+  gap: 11px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  color: #8aa3c0;
   text-decoration: none;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 700;
   transition: var(--transition);
   position: relative;
   white-space: nowrap;
@@ -160,39 +161,48 @@ body.sidebar-collapsed .sb-section { opacity: 0; height: 0; padding: 0; margin: 
 body.sidebar-collapsed .sb-nav a { padding: 10px; grid-template-columns: 1fr; justify-content: center; }
 body.sidebar-collapsed .sb-nav a .nav-text { opacity: 0; width: 0; display: none !important; }
 
+/* Colored icons — each link has data-color */
 .sb-nav a .nav-icon {
-  width: 34px; height: 34px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 9px;
-  font-size: 15px;
-  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  font-size: 16px;
   transition: var(--transition);
-  color: #64748b;
+  flex-shrink: 0;
 }
-body.sidebar-collapsed .sb-nav a .nav-icon { width: 40px; height: 40px; font-size: 17px; }
+body.sidebar-collapsed .sb-nav a .nav-icon { width: 42px; height: 42px; font-size: 18px; border-radius: 12px; }
+
+/* Individual icon colors */
+.nav-icon.ic-blue   { background: rgba(59,130,246,0.15);  color: #60a5fa; }
+.nav-icon.ic-green  { background: rgba(34,197,94,0.15);   color: #4ade80; }
+.nav-icon.ic-orange { background: rgba(249,115,22,0.15);  color: #fb923c; }
+.nav-icon.ic-purple { background: rgba(168,85,247,0.15);  color: #c084fc; }
+.nav-icon.ic-cyan   { background: rgba(6,182,212,0.15);   color: #22d3ee; }
+.nav-icon.ic-yellow { background: rgba(234,179,8,0.15);   color: #facc15; }
+.nav-icon.ic-emerald{ background: rgba(16,185,129,0.15);  color: #34d399; }
+.nav-icon.ic-rose   { background: rgba(244,63,94,0.15);   color: #fb7185; }
+.nav-icon.ic-indigo { background: rgba(99,102,241,0.15);  color: #818cf8; }
+.nav-icon.ic-amber  { background: rgba(245,158,11,0.15);  color: #fbbf24; }
+.nav-icon.ic-slate  { background: rgba(148,163,184,0.12); color: #94a3b8; }
 
 .sb-nav a:hover {
   background: rgba(255,255,255,0.06);
   color: #e2e8f0;
 }
-.sb-nav a:hover .nav-icon { color: #93c5fd; background: rgba(37,99,235,0.12); }
+.sb-nav a:hover .nav-icon { filter: brightness(1.2); transform: scale(1.08); }
 body.sidebar-collapsed .sb-nav a:hover { transform: scale(1.05); }
 
 .sb-nav a.active {
-  background: rgba(37,99,235,0.15);
-  color: #93c5fd;
+  background: rgba(255,255,255,0.07);
+  color: #f1f5f9;
 }
-.sb-nav a.active .nav-icon {
-  background: rgba(37,99,235,0.25);
-  color: #60a5fa;
-  box-shadow: 0 2px 8px rgba(37,99,235,0.2);
-}
+.sb-nav a.active .nav-icon { filter: brightness(1.3); box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
 .sb-nav a.active::before {
   content: '';
   position: absolute;
   right: 0; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 20px;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  width: 3px; height: 22px;
+  background: linear-gradient(180deg, #7dd3fc, #2563eb);
   border-radius: 3px 0 0 3px;
 }
 body.sidebar-collapsed .sb-nav a.active::before { display: none; }
@@ -200,13 +210,13 @@ body.sidebar-collapsed .sb-nav a.active::before { display: none; }
 /* Sidebar footer */
 .sb-footer {
   margin-top: auto;
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,0.05);
   transition: var(--transition);
   white-space: nowrap;
 }
 body.sidebar-collapsed .sb-footer { opacity: 0; visibility: hidden; padding: 0; height: 0; display: none; }
-.sb-version { font-size: 11px; color: #374151; text-align: center; font-weight: 600; }
+.sb-version { font-size: 11px; color: #1e3a5a; text-align: center; font-weight: 700; }
 
 /* ─── MAIN ───────────────────────────────────── */
 #main {
@@ -523,25 +533,25 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   <ul class="sb-nav">
     <li>
       <a href="<?= $base ?>index.php" class="<?= isActiveDash() ?>" title="لوحة التحكم">
-        <div class="nav-icon"><i class="bi bi-grid-fill"></i></div>
+        <div class="nav-icon ic-blue"><i class="bi bi-speedometer2"></i></div>
         <div class="nav-text">لوحة التحكم</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/clients/index.php" class="<?= isActive('/clients/') ?>" title="العملاء">
-        <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
+        <div class="nav-icon ic-emerald"><i class="bi bi-people-fill"></i></div>
         <div class="nav-text">العملاء</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/equipment/index.php" class="<?= isActive('/equipment/') ?>" title="المعدات">
-        <div class="nav-icon"><i class="bi bi-tools"></i></div>
+        <div class="nav-icon ic-orange"><i class="bi bi-wrench-adjustable-circle-fill"></i></div>
         <div class="nav-text">المعدات</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/contracts/index.php" class="<?= isActive('/contracts/') ?>" title="العقود">
-        <div class="nav-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+        <div class="nav-icon ic-purple"><i class="bi bi-file-earmark-text-fill"></i></div>
         <div class="nav-text">العقود</div>
       </a>
     </li>
@@ -551,7 +561,7 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   <ul class="sb-nav">
     <li>
       <a href="<?= $base ?>modules/reports/index.php" class="<?= isActive('/reports/') ?>" title="التقارير">
-        <div class="nav-icon"><i class="bi bi-bar-chart-fill"></i></div>
+        <div class="nav-icon ic-cyan"><i class="bi bi-bar-chart-line-fill"></i></div>
         <div class="nav-text">التقارير والمخزون</div>
       </a>
     </li>
@@ -561,19 +571,19 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   <ul class="sb-nav">
     <li>
       <a href="<?= $base ?>modules/invoices/index.php" class="<?= isActive('/invoices/') ?>" title="الفواتير">
-        <div class="nav-icon"><i class="bi bi-receipt-cutoff"></i></div>
+        <div class="nav-icon ic-yellow"><i class="bi bi-receipt-cutoff"></i></div>
         <div class="nav-text">الفواتير الإلكترونية</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/payments/index.php" class="<?= isActive('/payments/') ?>" title="المدفوعات">
-        <div class="nav-icon"><i class="bi bi-cash-stack"></i></div>
+        <div class="nav-icon ic-green"><i class="bi bi-cash-coin"></i></div>
         <div class="nav-text">المدفوعات</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/expenses/index.php" class="<?= isActive('/expenses/') ?>" title="المصروفات">
-        <div class="nav-icon"><i class="bi bi-wallet2"></i></div>
+        <div class="nav-icon ic-rose"><i class="bi bi-wallet2"></i></div>
         <div class="nav-text">المصروفات</div>
       </a>
     </li>
@@ -583,7 +593,7 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   <ul class="sb-nav">
     <li>
       <a href="<?= $base ?>modules/employees/index.php" class="<?= isActive('/employees/') ?>" title="الموظفون">
-        <div class="nav-icon"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="nav-icon ic-indigo"><i class="bi bi-person-badge-fill"></i></div>
         <div class="nav-text">الموظفون</div>
       </a>
     </li>
@@ -594,13 +604,13 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   <ul class="sb-nav">
     <li>
       <a href="<?= $base ?>modules/users/index.php" class="<?= isActive('/users/') ?>" title="إدارة المستخدمين">
-        <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
+        <div class="nav-icon ic-amber"><i class="bi bi-shield-lock-fill"></i></div>
         <div class="nav-text">إدارة المستخدمين</div>
       </a>
     </li>
     <li>
       <a href="<?= $base ?>modules/settings/index.php" class="<?= isActive('/settings/') ?>" title="إعدادات الشركة">
-        <div class="nav-icon"><i class="bi bi-gear-fill"></i></div>
+        <div class="nav-icon ic-slate"><i class="bi bi-gear-wide-connected"></i></div>
         <div class="nav-text">إعدادات الشركة</div>
       </a>
     </li>
