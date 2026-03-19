@@ -556,23 +556,23 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
     </li>
   </ul>
 
-  <?php if (isAdmin()): ?>
   <p class="sb-section">الإدارة</p>
   <ul class="sb-nav">
-    <li>
-      <a href="<?= $base ?>modules/settings/index.php" class="<?= isActive('/settings/') ?>" title="إعدادات الشركة">
-        <div class="nav-icon"><i class="bi bi-gear-fill"></i></div>
-        <div class="nav-text">إعدادات الشركة</div>
-      </a>
-    </li>
     <li>
       <a href="<?= $base ?>modules/users/index.php" class="<?= isActive('/users/') ?>" title="إدارة المستخدمين">
         <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
         <div class="nav-text">إدارة المستخدمين</div>
       </a>
     </li>
+    <?php if (isAdmin()): ?>
+    <li>
+      <a href="<?= $base ?>modules/settings/index.php" class="<?= isActive('/settings/') ?>" title="إعدادات الشركة">
+        <div class="nav-icon"><i class="bi bi-gear-fill"></i></div>
+        <div class="nav-text">إعدادات الشركة</div>
+      </a>
+    </li>
+    <?php endif; ?>
   </ul>
-  <?php endif; ?>
 
   <div class="sb-footer">
     <div class="sb-version"><i class="bi bi-circle-fill text-success" style="font-size:7px"></i> v1.0 &nbsp;·&nbsp; <?= date('Y') ?></div>
