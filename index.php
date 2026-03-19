@@ -2,14 +2,24 @@
 include 'config/db.php';
 include 'templates/header.php';
 
+// ── Safe query helper ─────────────────────────────
+function safeCount($conn, $sql) {
+    $r = $conn->query($sql);
+    return ($r && $r->num_rows) ? (int)$r->fetch_assoc()['c'] : 0;
+}
+function safeVal($conn, $sql) {
+    $r = $conn->query($sql);
+    return ($r && $r->num_rows) ? (float)$r->fetch_assoc()['s'] : 0;
+}
+
 // ── Stats ─────────────────────────────────────────
-$clients      = $conn->query("SELECT COUNT(*) c FROM clients")->fetch_assoc()['c'];
-$equipment    = $conn->query("SELECT COUNT(*) c FROM equipment")->fetch_assoc()['c'];
-$contracts    = $conn->query("SELECT COUNT(*) c FROM contracts")->fetch_assoc()['c'];
-$employees    = $conn->query("SELECT COUNT(*) c FROM employees")->fetch_assoc()['c'];
-$activeContr  = $conn->query("SELECT COUNT(*) c FROM contracts WHERE status='active'")->fetch_assoc()['c'];
-$totalRevenue = $conn->query("SELECT COALESCE(SUM(amount),0) s FROM payments")->fetch_assoc()['s'];
-$totalExpense = $conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses")->fetch_assoc()['s'];
+$clients      = safeCount($conn, "SELECT COUNT(*) c FROM clients");
+$equipment    = safeCount($conn, "SELECT COUNT(*) c FROM equipment");
+$contracts    = safeCount($conn, "SELECT COUNT(*) c FROM contracts");
+$employees    = safeCount($conn, "SELECT COUNT(*) c FROM employees");
+$activeContr  = safeCount($conn, "SELECT COUNT(*) c FROM contracts WHERE status='active'");
+$totalRevenue = safeVal($conn,   "SELECT COALESCE(SUM(amount),0) s FROM payments");
+$totalExpense = safeVal($conn,   "SELECT COALESCE(SUM(amount),0) s FROM expenses");
 $netProfit    = $totalRevenue - $totalExpense;
 
 // ── Smart Alerts Data ─────────────────────────────
@@ -44,27 +54,22 @@ $overdue = $conn->query("
 
 // 4. Contracts with unpaid balance > 0
 $unpaid = $conn->query("
-    SELECT c.id, c.total, cl.name client_name,
-           COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0) AS paid
-    FROM contracts c JOIN clients cl ON c.client_id=cl.id
-    WHERE c.status='active'
-    HAVING paid < c.total
-    ORDER BY (c.total - paid) DESC
+    SELECT id, total, client_name, paid FROM (
+        SELECT c.id, c.total, cl.name client_name,
+               COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0) AS paid
+        FROM contracts c JOIN clients cl ON c.client_id=cl.id
+        WHERE c.status='active'
+    ) sub
+    WHERE paid < total
+    ORDER BY (total - paid) DESC
     LIMIT 5
 ");
 
 // 5. No expenses this month?
-$expThisMonth = (int)$conn->query("
-    SELECT COUNT(*) c FROM expenses
-    WHERE YEAR(expense_date)=YEAR(CURDATE()) AND MONTH(expense_date)=MONTH(CURDATE())
-")->fetch_assoc()['c'];
+$expThisMonth = safeCount($conn, "SELECT COUNT(*) c FROM expenses WHERE YEAR(expense_date)=YEAR(CURDATE()) AND MONTH(expense_date)=MONTH(CURDATE())");
 
 // 6. Unpaid invoices count
-$unpaidInvoices = (int)$conn->query("
-    SELECT COUNT(*) c FROM invoices i
-    WHERE i.status='active'
-    AND (SELECT COALESCE(SUM(p.amount),0) FROM payments p WHERE p.contract_id=i.contract_id) < i.total
-")->fetch_assoc()['c'];
+$unpaidInvoices = safeCount($conn, "SELECT COUNT(*) c FROM invoices i WHERE i.status='active' AND (SELECT COALESCE(SUM(p.amount),0) FROM payments p WHERE p.contract_id=i.contract_id) < i.total");
 
 // Collect all alerts
 $alerts = [];
@@ -309,23 +314,10 @@ if ($expThisMonth == 0) {
 <!-- ── Quick Insight Row ───────────────────────── -->
 <div class="row g-3 mb-4">
   <?php
-  // Unpaid total across all active contracts
-  $totalUnpaid = (float)$conn->query("
-      SELECT COALESCE(SUM(c.total - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0)),0) r
-      FROM contracts c WHERE c.status='active'
-  ")->fetch_assoc()['r'];
-
-  // Month revenue
-  $monthRevenue = (float)$conn->query("
-      SELECT COALESCE(SUM(amount),0) s FROM payments
-      WHERE YEAR(payment_date)=YEAR(CURDATE()) AND MONTH(payment_date)=MONTH(CURDATE())
-  ")->fetch_assoc()['s'];
-
-  // Month expense
-  $monthExpense = (float)$conn->query("
-      SELECT COALESCE(SUM(amount),0) s FROM expenses
-      WHERE YEAR(expense_date)=YEAR(CURDATE()) AND MONTH(expense_date)=MONTH(CURDATE())
-  ")->fetch_assoc()['s'];
+  $r = $conn->query("SELECT COALESCE(SUM(c.total - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.contract_id=c.id),0)),0) r FROM contracts c WHERE c.status='active'");
+  $totalUnpaid  = ($r && $r->num_rows) ? (float)$r->fetch_assoc()['r'] : 0;
+  $monthRevenue = safeVal($conn, "SELECT COALESCE(SUM(amount),0) s FROM payments WHERE YEAR(payment_date)=YEAR(CURDATE()) AND MONTH(payment_date)=MONTH(CURDATE())");
+  $monthExpense = safeVal($conn, "SELECT COALESCE(SUM(amount),0) s FROM expenses WHERE YEAR(expense_date)=YEAR(CURDATE()) AND MONTH(expense_date)=MONTH(CURDATE())");
   ?>
   <div class="col-md-4">
     <div class="stat-card" style="background:linear-gradient(135deg,#fff7ed,#fed7aa)">
