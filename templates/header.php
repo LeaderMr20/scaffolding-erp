@@ -499,6 +499,16 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
     </li>
   </ul>
 
+  <p class="sb-section">التقارير</p>
+  <ul class="sb-nav">
+    <li>
+      <a href="<?= $base ?>modules/reports/index.php" class="<?= isActive('/reports/') ?>" title="التقارير">
+        <div class="nav-icon"><i class="bi bi-bar-chart-fill"></i></div>
+        <div class="nav-text">التقارير والمخزون</div>
+      </a>
+    </li>
+  </ul>
+
   <p class="sb-section">المالية</p>
   <ul class="sb-nav">
     <li>
