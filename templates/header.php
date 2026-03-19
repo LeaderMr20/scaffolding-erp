@@ -20,7 +20,14 @@ function isActiveDash() {
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a6e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="السقالات ERP">
+<link rel="manifest" href="<?= $base ?>manifest.json">
+<link rel="apple-touch-icon" href="<?= $base ?>icons/icon-192.png">
 <title>نظام إدارة السقالات</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -456,7 +463,15 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
   .topbar-title { font-size: 16px; }
   .stat-value { font-size: 26px; }
   .finance-card .fc-value { font-size: 24px; }
+  .page-header { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+  .page-header > div:last-child { width: 100%; }
+  .page-header .btn { width: 100%; }
 }
+/* Mobile table: horizontal scroll */
+.table-responsive { -webkit-overflow-scrolling: touch; }
+.card .table-responsive, .card > .card-body > .table-responsive { overflow-x: auto; }
+/* Safe area for notch phones */
+#content { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
 </style>
 </head>
 <body class="">
@@ -591,6 +606,10 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
         <span style="font-size:10px;background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:20px;font-weight:800;">مدير</span>
         <?php endif; ?>
       </div>
+      <button id="pwaInstallBtn" onclick="installPWA()" title="تثبيت التطبيق"
+        style="display:none;align-items:center;gap:6px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="bi bi-download"></i> <span class="d-none d-sm-inline">تثبيت</span>
+      </button>
       <a href="<?= $base ?>logout.php" class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:none;font-weight:700;border-radius:10px;" title="تسجيل الخروج">
         <i class="bi bi-box-arrow-left me-1"></i> خروج
       </a>

@@ -24,6 +24,32 @@ function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sbOverlay').classList.remove('open');
 }
+
+// PWA Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
+// PWA Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.style.display = 'none';
+});
+function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    }
+}
 </script>
 </body>
 </html>
