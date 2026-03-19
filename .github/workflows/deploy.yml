@@ -101,9 +101,9 @@ jobs:
               }
           }
 
-          // Seed default admin user if no users exist
-          $uc = $conn->query("SELECT COUNT(*) c FROM users");
-          if ($uc && (int)$uc->fetch_assoc()['c'] === 0) {
+          // Ensure admin user exists (by username, not by count)
+          $adminExists = $conn->query("SELECT id FROM users WHERE username='admin' LIMIT 1");
+          if ($adminExists && $adminExists->num_rows === 0) {
               $hash = password_hash('admin123', PASSWORD_DEFAULT);
               $hash = $conn->real_escape_string($hash);
               $conn->query("INSERT INTO users(full_name, username, password, role) VALUES('مدير النظام', 'admin', '$hash', 'admin')");
