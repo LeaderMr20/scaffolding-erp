@@ -2,856 +2,955 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>عرض تقديمي — نظام إدارة السقالات ERP</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نظام إدارة السقالات ERP — وثيقة المواصفات الفنية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:#fff;color:#1e293b;}
-
-/* ── PAGE SETUP ── */
-@page{size:A4;margin:0;}
-@media print{
-  .no-print{display:none!important;}
-  .page{page-break-after:always;page-break-inside:avoid;}
-  .page:last-child{page-break-after:auto;}
+/* ═══ RESET & BASE ═══════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --navy:   #0b162c;
+  --blue:   #1d4ed8;
+  --blue2:  #2563eb;
+  --sky:    #38bdf8;
+  --gold:   #f59e0b;
+  --green:  #10b981;
+  --red:    #ef4444;
+  --purple: #7c3aed;
+  --text:   #1e293b;
+  --muted:  #64748b;
+  --bg:     #f8fafc;
+  --white:  #ffffff;
+  --border: #e2e8f0;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-/* ── PRINT BUTTON ── */
-.no-print{
-  position:fixed;top:20px;left:20px;z-index:9999;
-  display:flex;gap:10px;
-}
-.no-print button{
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-  color:#fff;border:none;border-radius:12px;
-  padding:12px 24px;font-family:'Cairo',sans-serif;
-  font-size:15px;font-weight:700;cursor:pointer;
-  box-shadow:0 4px 16px rgba(37,99,235,.4);
+/* ═══ PAGE LAYOUT ════════════════════════════════ */
+@page { size: A4; margin: 0; }
+@media print {
+  .no-print { display: none !important; }
+  .page { page-break-after: always; page-break-inside: avoid; }
+  .page:last-child { page-break-after: auto; }
+  body { background: #fff; }
 }
 
-/* ══════════════════════════════════════════
+/* ═══ FLOATING NAV ═══════════════════════════════ */
+.float-nav {
+  position: fixed; top: 24px; left: 24px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.float-nav button, .float-nav a {
+  background: var(--blue2); color: #fff; border: none;
+  border-radius: 10px; padding: 10px 20px;
+  font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; text-decoration: none; text-align: center;
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
+  transition: opacity .2s;
+}
+.float-nav button:hover, .float-nav a:hover { opacity: .85; }
+
+/* ═══ PAGE WRAPPER ═══════════════════════════════ */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 32px;
+  background: #fff;
+  box-shadow: 0 4px 40px rgba(0,0,0,.12);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════
    PAGE 1 — COVER
-══════════════════════════════════════════ */
-.page{width:210mm;min-height:297mm;position:relative;overflow:hidden;}
+════════════════════════════════════════════════ */
+.cover {
+  background: var(--navy);
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+}
+.cover-top {
+  background: linear-gradient(135deg, #0b162c 0%, #1e3a6e 60%, #1d4ed8 100%);
+  padding: 64px 56px 80px;
+  position: relative;
+  flex: 1;
+}
+.cover-top::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+.cover-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 100px; padding: 8px 20px;
+  color: var(--sky); font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; margin-bottom: 40px;
+  position: relative;
+}
+.cover-title {
+  font-size: 48px; font-weight: 900; color: #fff;
+  line-height: 1.15; margin-bottom: 12px; position: relative;
+}
+.cover-title span { color: var(--sky); }
+.cover-sub {
+  font-size: 20px; color: #93c5fd; font-weight: 500;
+  margin-bottom: 48px; position: relative;
+}
+.cover-tags {
+  display: flex; flex-wrap: wrap; gap: 10px; position: relative;
+}
+.cover-tag {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px; padding: 7px 16px;
+  color: #e2e8f0; font-size: 12px; font-weight: 600;
+}
+.cover-bottom {
+  background: rgba(0,0,0,.3);
+  padding: 32px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cover-logo {
+  display: flex; align-items: center; gap: 14px;
+}
+.cover-logo-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--blue2), var(--sky));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #fff;
+}
+.cover-logo-text { color: #fff; }
+.cover-logo-text strong { font-size: 18px; font-weight: 900; display: block; }
+.cover-logo-text span { font-size: 12px; color: #93c5fd; }
+.cover-meta { text-align: left; color: #94a3b8; font-size: 12px; line-height: 1.8; }
+.cover-meta strong { color: #fff; font-size: 13px; }
 
-.cover{
-  background:linear-gradient(160deg,#0b162c 0%,#1e3a6e 50%,#0b162c 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:297mm;text-align:center;padding:60px 40px;
+/* ═══════════════════════════════════════════════
+   SHARED COMPONENTS
+════════════════════════════════════════════════ */
+.p-content { padding: 52px 56px; }
+.section-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  color: var(--blue2); text-transform: uppercase;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
 }
-.cover-badge{
-  background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.5);
-  border-radius:30px;padding:8px 28px;font-size:13px;color:#93c5fd;
-  font-weight:700;letter-spacing:1px;margin-bottom:36px;
+.section-label::after {
+  content: ''; flex: 1; height: 2px;
+  background: linear-gradient(to left, transparent, var(--blue2));
+  border-radius: 2px;
 }
-.cover-logo{
-  width:100px;height:100px;
-  background:linear-gradient(135deg,#2563eb,#60a5fa);
-  border-radius:28px;display:flex;align-items:center;justify-content:center;
-  font-size:50px;margin:0 auto 32px;
-  box-shadow:0 20px 60px rgba(37,99,235,.5);
+.section-title {
+  font-size: 28px; font-weight: 900; color: var(--navy);
+  margin-bottom: 8px; line-height: 1.3;
 }
-.cover h1{font-size:52px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:12px;}
-.cover h1 span{color:#fbbf24;}
-.cover-sub{font-size:18px;color:#93c5fd;font-weight:600;margin-bottom:48px;}
-.cover-divider{width:80px;height:4px;background:linear-gradient(90deg,#2563eb,#fbbf24);border-radius:4px;margin:0 auto 48px;}
-
-.cover-stats{
-  display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:60px;
-}
-.cstat{
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:16px;padding:20px 28px;min-width:130px;
-}
-.cstat .num{font-size:36px;font-weight:900;color:#fbbf24;}
-.cstat .lbl{font-size:12px;color:#93c5fd;font-weight:600;margin-top:4px;}
-
-.cover-company{
-  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);
-  border-radius:16px;padding:20px 36px;
-}
-.cover-company .cn{font-size:22px;font-weight:900;color:#fff;}
-.cover-company .cv{font-size:13px;color:#93c5fd;margin-top:6px;}
-
-.cover-footer{
-  position:absolute;bottom:32px;left:0;right:0;text-align:center;
-  font-size:12px;color:#334155;
+.section-title span { color: var(--blue2); }
+.section-desc {
+  color: var(--muted); font-size: 14px; margin-bottom: 36px;
+  max-width: 560px;
 }
 
-/* ══════════════════════════════════════════
-   PAGE 2 — OVERVIEW
-══════════════════════════════════════════ */
-.page-inner{padding:50px 48px;min-height:297mm;display:flex;flex-direction:column;}
-.section-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:#eff6ff;border:1px solid #bfdbfe;
-  border-radius:24px;padding:6px 20px;font-size:12px;
-  color:#2563eb;font-weight:800;letter-spacing:.5px;margin-bottom:16px;
+/* Stats row */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+  margin-bottom: 36px;
 }
-.page-title{font-size:34px;font-weight:900;color:#0b162c;margin-bottom:8px;}
-.page-title span{color:#2563eb;}
-.page-desc{font-size:14px;color:#64748b;font-weight:500;margin-bottom:40px;line-height:1.7;}
+.stat-box {
+  background: var(--navy); border-radius: 14px;
+  padding: 20px 16px; text-align: center; color: #fff;
+}
+.stat-box .val { font-size: 32px; font-weight: 900; line-height: 1; }
+.stat-box .lbl { font-size: 11px; color: #93c5fd; margin-top: 4px; }
+.stat-box .ico { font-size: 20px; margin-bottom: 6px; }
 
-/* Feature cards */
-.features-grid{
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:40px;
+/* Module cards */
+.mod-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.mod-card {
+  border: 2px solid var(--border); border-radius: 14px;
+  padding: 18px; transition: border-color .2s;
 }
-.feat-card{
-  background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;
-  padding:24px 20px;transition:all .2s;
+.mod-card:hover { border-color: var(--blue2); }
+.mod-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 10px;
 }
-.feat-icon{
-  width:52px;height:52px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;margin-bottom:16px;
+.mod-name { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+.mod-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+/* Feature list */
+.feat-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feat-list li {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-radius: 10px;
+  background: var(--bg); border: 1px solid var(--border);
 }
-.feat-card h3{font-size:15px;font-weight:800;color:#0b162c;margin-bottom:8px;}
-.feat-card p{font-size:12px;color:#64748b;line-height:1.6;font-weight:500;}
-.feat-card .tag{
-  display:inline-block;margin-top:12px;
-  background:#dbeafe;color:#1d4ed8;
-  border-radius:12px;padding:3px 10px;font-size:11px;font-weight:700;
-}
+.feat-list .fi { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.feat-list .ft { font-weight: 700; font-size: 13px; color: var(--navy); }
+.feat-list .fd { font-size: 12px; color: var(--muted); }
 
 /* Tech stack */
-.tech-row{
-  background:linear-gradient(135deg,#0b162c,#1e3a6e);
-  border-radius:16px;padding:28px 32px;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
+.tech-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.tech-card {
+  border-radius: 12px; padding: 20px;
+  border: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 14px;
 }
-.tech-item{text-align:center;}
-.tech-item .ti{font-size:28px;margin-bottom:6px;}
-.tech-item .tn{font-size:11px;color:#93c5fd;font-weight:700;}
+.tech-icon { font-size: 28px; flex-shrink: 0; }
+.tech-name { font-weight: 800; font-size: 14px; color: var(--navy); margin-bottom: 4px; }
+.tech-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
-/* ══════════════════════════════════════════
-   PAGE 3 — DASHBOARD SCREENSHOT
-══════════════════════════════════════════ */
-.screen-page{padding:40px 48px;min-height:297mm;}
-.screen-title{font-size:26px;font-weight:900;color:#0b162c;margin-bottom:6px;}
-.screen-desc{font-size:13px;color:#64748b;margin-bottom:28px;}
-
-/* Mock UI */
-.mock-browser{
-  border:2px solid #e2e8f0;border-radius:12px;overflow:hidden;
-  box-shadow:0 12px 40px rgba(0,0,0,.1);
+/* Accounting */
+.acc-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.acc-card {
+  border-radius: 14px; padding: 22px;
+  border: 2px solid var(--border);
 }
-.mock-bar{
-  background:#f1f5f9;border-bottom:1px solid #e2e8f0;
-  padding:10px 16px;display:flex;align-items:center;gap:8px;
+.acc-card .ac-icon { font-size: 28px; margin-bottom: 10px; }
+.acc-card .ac-title { font-weight: 900; font-size: 15px; color: var(--navy); margin-bottom: 8px; }
+.acc-card ul { list-style: none; }
+.acc-card ul li {
+  font-size: 12px; color: var(--muted); padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
 }
-.mock-dot{width:10px;height:10px;border-radius:50%;}
-.mock-url{
-  flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:6px;
-  padding:4px 12px;font-size:11px;color:#64748b;margin:0 12px;
-  font-family:monospace;
+.acc-card ul li:last-child { border-bottom: none; }
+.acc-card ul li::before {
+  content: '✓'; color: var(--green);
+  font-weight: 900; font-size: 11px; flex-shrink: 0;
 }
 
-/* Dashboard mock */
-.dash-layout{display:flex;min-height:400px;}
-.dash-sidebar{
-  width:190px;background:#0b162c;padding:16px 12px;flex-shrink:0;
-}
-.dash-brand{
-  background:linear-gradient(135deg,#2563eb,#60a5fa);
-  border-radius:10px;padding:10px;text-align:center;
-  margin-bottom:16px;
-}
-.dash-brand .db-icon{font-size:22px;color:#fff;}
-.dash-brand .db-text{font-size:10px;color:#bfdbfe;font-weight:700;}
-.dash-nav-item{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 10px;border-radius:8px;
-  margin-bottom:3px;font-size:11px;color:#94a3b8;font-weight:600;
-}
-.dash-nav-item.active{background:#1e3a6e;color:#fff;}
-.dash-nav-item .ni{
-  width:26px;height:26px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;font-size:13px;
-}
-.dash-nav-item.active .ni{background:#2563eb;color:#fff;}
-
-.dash-main{flex:1;background:#f1f5f9;padding:16px;}
-.dash-topbar{
-  background:#fff;border-radius:10px;padding:10px 16px;
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);
-}
-.dash-topbar .dt-title{font-size:13px;font-weight:800;color:#0b162c;}
-.dash-topbar .dt-chip{
-  background:#f1f5f9;border:1px solid #e2e8f0;border-radius:16px;
-  padding:4px 12px;font-size:10px;color:#64748b;font-weight:600;
+/* Divider */
+.divider {
+  height: 3px;
+  background: linear-gradient(to left, var(--blue2), var(--sky), var(--blue2));
+  border-radius: 2px; margin: 32px 0;
 }
 
-.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
-.ds-card{
-  background:#fff;border-radius:10px;padding:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
+/* Page header strip */
+.page-strip {
+  background: var(--navy);
+  padding: 20px 56px;
+  display: flex; justify-content: space-between; align-items: center;
 }
-.ds-card .dc-icon{
-  width:36px;height:36px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;
+.page-strip .ps-title { color: #fff; font-weight: 800; font-size: 16px; }
+.page-strip .ps-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--blue2); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 14px;
 }
-.ds-card .dc-val{font-size:18px;font-weight:900;color:#0b162c;}
-.ds-card .dc-lbl{font-size:9px;color:#94a3b8;font-weight:600;margin-top:2px;}
 
-.dash-row{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;}
-.dash-card{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
-.dc-head{font-size:11px;font-weight:800;color:#0b162c;margin-bottom:10px;display:flex;justify-content:space-between;}
-.dc-head span{color:#64748b;font-weight:600;}
+/* Page footer strip */
+.page-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--bg); border-top: 2px solid var(--border);
+  padding: 14px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--muted);
+}
+.page-footer strong { color: var(--navy); }
 
-.mini-table th{font-size:9px;color:#94a3b8;font-weight:700;padding:4px 8px;border-bottom:1px solid #f1f5f9;}
-.mini-table td{font-size:10px;padding:5px 8px;border-bottom:1px solid #f8fafc;color:#374151;}
-.mini-badge{display:inline-block;border-radius:8px;padding:2px 7px;font-size:9px;font-weight:700;}
+/* Highlight box */
+.hl-box {
+  border-radius: 14px; padding: 20px 24px;
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 20px;
+}
+.hl-box .hb-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.hl-box .hb-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.hl-box .hb-text { font-size: 12px; line-height: 1.7; }
 
-.mini-list-item{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:10px;
-}
-.mini-list-item:last-child{border:none;}
-.mli-name{color:#374151;font-weight:600;}
-.mli-val{color:#2563eb;font-weight:700;}
+/* Two column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
-/* ══════════════════════════════════════════
-   PAGE 4 — CONTRACTS + INVOICE
-══════════════════════════════════════════ */
-.two-screens{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;}
+/* Security list */
+.sec-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px; border-radius: 10px; margin-bottom: 10px;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+}
+.sec-item .si-icon { font-size: 20px; flex-shrink: 0; color: var(--green); }
+.sec-item .si-title { font-weight: 700; font-size: 13px; color: #065f46; }
+.sec-item .si-text { font-size: 11px; color: #047857; }
 
-/* Invoice mock */
-.inv-mock{
-  border:1.5px solid #0b162c;border-radius:6px;overflow:hidden;
-  box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:9px;
+/* Summary table */
+.sum-table { width: 100%; border-collapse: collapse; }
+.sum-table th {
+  background: var(--navy); color: #fff;
+  padding: 12px 16px; font-size: 12px; text-align: right;
 }
-.inv-mock-head{
-  background:linear-gradient(135deg,#0b162c,#1e3a6e);
-  padding:14px 16px;color:#fff;
-  display:flex;justify-content:space-between;align-items:center;
+.sum-table td {
+  padding: 11px 16px; font-size: 12px;
+  border-bottom: 1px solid var(--border);
 }
-.imh-name{font-size:13px;font-weight:900;}
-.imh-type{font-size:9px;color:#fbbf24;font-weight:700;margin-top:2px;}
-.imh-num{font-size:14px;font-weight:900;color:#fbbf24;text-align:left;}
-.imh-date{font-size:9px;color:#93c5fd;text-align:left;}
+.sum-table tr:nth-child(even) td { background: var(--bg); }
+.sum-table .badge {
+  display: inline-block; border-radius: 100px;
+  padding: 3px 10px; font-size: 11px; font-weight: 700;
+}
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-blue  { background: #dbeafe; color: #1d4ed8; }
+.badge-gold  { background: #fef3c7; color: #92400e; }
 
-.inv-info-row{
-  display:grid;grid-template-columns:1fr 80px 1fr;
-  border-bottom:1.5px solid #0b162c;
+/* ═══ CONCLUSION PAGE ════════════════════════════ */
+.conclusion {
+  background: linear-gradient(160deg, var(--navy) 0%, #1e3a6e 50%, #1d4ed8 100%);
+  min-height: 297mm;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center; padding: 64px 56px;
+  color: #fff; position: relative;
 }
-.inv-box{padding:10px 12px;border-left:1px solid #e2e8f0;}
-.inv-box:last-child{border-left:none;}
-.inv-box-title{
-  background:#0b162c;color:#fff;font-size:8px;font-weight:800;
-  padding:4px 12px;margin:-10px -12px 8px;
+.conclusion::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(56,189,248,.1) 0%, transparent 70%);
 }
-.inv-box p{font-size:9px;color:#374151;margin:2px 0;font-weight:600;}
-.inv-box .v{color:#1d4ed8;font-weight:700;}
-.qr-placeholder{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px;text-align:center;
+.con-big { font-size: 56px; font-weight: 900; line-height: 1.15; position: relative; margin-bottom: 16px; }
+.con-big span { color: var(--sky); }
+.con-sub { font-size: 18px; color: #93c5fd; margin-bottom: 48px; position: relative; }
+.con-cards {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  width: 100%; max-width: 640px; position: relative; margin-bottom: 48px;
 }
-.qr-sq{
-  width:60px;height:60px;background:#0b162c;border-radius:4px;
-  display:grid;grid-template-columns:repeat(5,1fr);gap:1px;padding:4px;
+.con-card {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 14px; padding: 20px;
 }
-.qr-sq .qc{background:#fff;border-radius:1px;}
-.qr-sq .qb{background:#0b162c;}
-
-.inv-items-label{
-  background:#0b162c;color:#fff;font-size:8px;font-weight:800;padding:5px 12px;
+.con-card .cc-val { font-size: 28px; font-weight: 900; color: var(--sky); }
+.con-card .cc-lbl { font-size: 11px; color: #93c5fd; margin-top: 2px; }
+.con-contact {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; padding: 24px 40px;
+  position: relative;
 }
-.inv-items-table{width:100%;border-collapse:collapse;font-size:9px;}
-.inv-items-table th{
-  background:#1e3a6e;color:#fff;padding:5px 8px;border:1px solid #2563eb;font-weight:700;
-}
-.inv-items-table td{padding:5px 8px;border:1px solid #e2e8f0;}
-
-.inv-totals{display:flex;justify-content:flex-end;border-top:1.5px solid #0b162c;}
-.inv-tot-table{border-collapse:collapse;min-width:150px;font-size:9px;}
-.inv-tot-table td{padding:5px 10px;border:1px solid #e2e8f0;}
-.inv-tot-table tr:last-child td{background:#0b162c;color:#fff;font-weight:900;}
-
-/* Contract mock */
-.contract-mock{
-  background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
-  overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08);
-}
-.cm-head{
-  background:#0b162c;padding:12px 16px;color:#fff;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.cm-head .cmh-title{font-size:13px;font-weight:900;}
-.cm-head .cmh-badge{
-  background:rgba(34,197,94,.2);color:#4ade80;
-  border-radius:12px;padding:3px 10px;font-size:9px;font-weight:800;
-}
-.cm-body{padding:14px;}
-.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.cm-info-card{
-  background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;
-}
-.cm-info-card .ci-title{font-size:9px;font-weight:800;color:#64748b;margin-bottom:6px;}
-.cm-info-row{display:flex;justify-content:space-between;margin:3px 0;font-size:9px;}
-.cm-info-row .label{color:#94a3b8;}
-.cm-info-row .value{font-weight:700;color:#0b162c;}
-.cm-prog-wrap{
-  background:#f1f5f9;border-radius:6px;height:20px;overflow:hidden;margin-top:6px;
-}
-.cm-prog{background:linear-gradient(90deg,#22c55e,#16a34a);height:100%;border-radius:6px;
-display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800;}
-
-.cm-table{width:100%;border-collapse:collapse;font-size:9px;}
-.cm-table th{background:#f1f5f9;padding:5px 8px;text-align:right;color:#64748b;font-weight:700;border-bottom:1px solid #e2e8f0;}
-.cm-table td{padding:5px 8px;border-bottom:1px solid #f8fafc;color:#374151;}
-.cm-table td:last-child{color:#1d4ed8;font-weight:700;}
-
-/* ══════════════════════════════════════════
-   PAGE 5 — BENEFITS & CTA
-══════════════════════════════════════════ */
-.benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px 0;}
-.benefit-card{
-  background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:24px;
-  display:flex;gap:16px;align-items:flex-start;
-}
-.benefit-icon{
-  width:48px;height:48px;border-radius:14px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-}
-.benefit-card h3{font-size:15px;font-weight:800;color:#0b162c;margin-bottom:6px;}
-.benefit-card p{font-size:12px;color:#64748b;line-height:1.7;}
-
-.cta-box{
-  background:linear-gradient(135deg,#0b162c,#1e3a6e);
-  border-radius:20px;padding:40px;text-align:center;
-}
-.cta-box h2{font-size:28px;font-weight:900;color:#fff;margin-bottom:12px;}
-.cta-box p{font-size:14px;color:#93c5fd;margin-bottom:28px;line-height:1.7;}
-.cta-info{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;}
-.cta-chip{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  border-radius:12px;padding:12px 24px;color:#fff;font-size:13px;font-weight:700;
-}
-.cta-chip span{color:#fbbf24;}
-
-/* Colors */
-.bg-blue{background:linear-gradient(135deg,#eff6ff,#dbeafe);color:#2563eb;}
-.bg-green{background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;}
-.bg-amber{background:linear-gradient(135deg,#fffbeb,#fef3c7);color:#d97706;}
-.bg-purple{background:linear-gradient(135deg,#faf5ff,#f3e8ff);color:#9333ea;}
-.bg-rose{background:linear-gradient(135deg,#fff1f2,#ffe4e6);color:#e11d48;}
-.bg-teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);color:#0d9488;}
-.bg-dark{background:#0b162c;color:#fff;}
-.bg-dark2{background:#1e3a6e;color:#fff;}
+.con-contact p { color: #cbd5e1; font-size: 13px; margin-bottom: 6px; }
+.con-contact strong { color: #fff; font-size: 15px; }
 </style>
 </head>
 <body>
 
-<!-- Print button -->
-<div class="no-print">
-  <button onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+<!-- ─── FLOATING CONTROLS ─────────────────────── -->
+<div class="float-nav no-print">
+  <button onclick="window.print()"><i class="bi bi-printer"></i> طباعة / PDF</button>
 </div>
+
 
 <!-- ═══════════════════════════════════════════════
      PAGE 1 — COVER
 ════════════════════════════════════════════════ -->
 <div class="page">
-<div class="cover">
-  <div class="cover-badge">🏆 نظام إدارة متكامل للمنشآت الصناعية</div>
-
-  <div class="cover-logo">🏗️</div>
-
-  <h1>نظام إدارة <span>السقالات</span></h1>
-  <div class="cover-sub">Scaffolding ERP — منصة رقمية متكاملة لإدارة العمليات</div>
-  <div class="cover-divider"></div>
-
-  <div class="cover-stats">
-    <div class="cstat">
-      <div class="num">8</div>
-      <div class="lbl">وحدات متكاملة</div>
+  <div class="cover">
+    <div class="cover-top">
+      <div class="cover-badge">
+        <i class="bi bi-shield-check-fill"></i>
+        وثيقة المواصفات الفنية — النسخة 2.0
+      </div>
+      <div class="cover-title">
+        نظام إدارة<br><span>السقالات</span> المتكامل
+      </div>
+      <div class="cover-sub">ERP System — Enterprise Resource Planning</div>
+      <div class="cover-tags">
+        <span class="cover-tag"><i class="bi bi-globe me-1"></i>Web Application</span>
+        <span class="cover-tag"><i class="bi bi-phone me-1"></i>PWA — يعمل على الجوال</span>
+        <span class="cover-tag"><i class="bi bi-cloud-check me-1"></i>Cloud Hosted</span>
+        <span class="cover-tag"><i class="bi bi-translate me-1"></i>Arabic RTL</span>
+        <span class="cover-tag"><i class="bi bi-receipt me-1"></i>فاتورة إلكترونية</span>
+        <span class="cover-tag"><i class="bi bi-journal-bookmark me-1"></i>محاسبة مالية</span>
+      </div>
     </div>
-    <div class="cstat">
-      <div class="num">100%</div>
-      <div class="lbl">واجهة عربية RTL</div>
-    </div>
-    <div class="cstat">
-      <div class="num">ZATCA</div>
-      <div class="lbl">فواتير إلكترونية معتمدة</div>
-    </div>
-    <div class="cstat">
-      <div class="num">24/7</div>
-      <div class="lbl">وصول سحابي</div>
-    </div>
-  </div>
-
-  <div class="cover-company">
-    <div class="cn">مؤسسة الجود للسقالات</div>
-    <div class="cv">الرقم الضريبي: 314325455800012 &nbsp;|&nbsp; نظام ERP خاص بالمنشأة</div>
-  </div>
-
-  <div class="cover-footer">
-    تم التطوير بواسطة: <strong style="color:#93c5fd">التقنية المرنة لنظم المعلومات</strong>
-    &nbsp;|&nbsp; 📞 0543717265 &nbsp;|&nbsp; erpmanagement.wuaze.com
-  </div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     PAGE 2 — OVERVIEW
-════════════════════════════════════════════════ -->
-<div class="page">
-<div class="page-inner">
-  <div class="section-badge">⚡ نظرة عامة على النظام</div>
-  <div class="page-title">منصة شاملة لـ <span>إدارة جميع عمليات</span> المنشأة</div>
-  <p class="page-desc">
-    نظام ERP متكامل مصمم خصيصاً لمنشآت تأجير السقالات والمعدات الصناعية، يوحّد إدارة العقود والعملاء والفواتير والمدفوعات والمصروفات والموظفين في منصة واحدة سهلة الاستخدام، مع امتثال كامل لمتطلبات هيئة الزكاة والدخل والضرائب.
-  </p>
-
-  <div class="features-grid">
-    <div class="feat-card">
-      <div class="feat-icon bg-blue">👥</div>
-      <h3>إدارة العملاء</h3>
-      <p>قاعدة بيانات كاملة للعملاء مع معلومات التواصل والتاريخ الكامل لعقودهم ومدفوعاتهم</p>
-      <span class="tag">CRM متكامل</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon bg-amber">🔧</div>
-      <h3>إدارة المعدات</h3>
-      <p>سجل شامل لجميع المعدات والسقالات مع تسعيرة يومية قابلة للتعديل لكل صنف</p>
-      <span class="tag">كتالوج ذكي</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon bg-purple">📋</div>
-      <h3>عقود الإيجار</h3>
-      <p>إنشاء عقود إيجار متعددة البنود مع حساب تلقائي للإجمالي بناءً على المدة والكميات</p>
-      <span class="tag">حساب تلقائي</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon bg-green">🧾</div>
-      <h3>الفواتير الإلكترونية</h3>
-      <p>فواتير إلكترونية مبسطة متوافقة مع متطلبات ZATCA مع رمز QR مشفر بصيغة TLV+Base64</p>
-      <span class="tag">ZATCA معتمد</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon bg-teal">💵</div>
-      <h3>المدفوعات والتحصيل</h3>
-      <p>تتبع الدفعات الجزئية والكاملة لكل عقد مع عرض المبلغ المتبقي وشريط التقدم</p>
-      <span class="tag">تتبع فوري</span>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon bg-rose">💰</div>
-      <h3>إدارة المصروفات</h3>
-      <p>تسجيل مصروفات المنشأة بفئات جاهزة قابلة للتخصيص مع تقارير شهرية وإجمالية</p>
-      <span class="tag">13 فئة افتراضية</span>
-    </div>
-  </div>
-
-  <div class="tech-row">
-    <div class="tech-item">
-      <div class="ti">🐘</div>
-      <div class="tn">PHP 8.x</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">🗄️</div>
-      <div class="tn">MySQL</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">🎨</div>
-      <div class="tn">Bootstrap 5 RTL</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">☁️</div>
-      <div class="tn">Cloud Hosting</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">🔐</div>
-      <div class="tn">نظام صلاحيات</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">📱</div>
-      <div class="tn">متجاوب مع الجوال</div>
-    </div>
-    <div class="tech-item">
-      <div class="ti">🚀</div>
-      <div class="tn">GitHub CI/CD</div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     PAGE 3 — DASHBOARD SCREENSHOT
-════════════════════════════════════════════════ -->
-<div class="page">
-<div class="screen-page">
-  <div class="section-badge">📊 لقطة شاشة — لوحة التحكم</div>
-  <div class="screen-title">لوحة التحكم الرئيسية</div>
-  <p class="screen-desc">نظرة شاملة فورية على أداء المنشأة — العقود، الإيرادات، المدفوعات، والمصروفات في مكان واحد</p>
-
-  <div class="mock-browser">
-    <div class="mock-bar">
-      <div class="mock-dot" style="background:#ff5f57"></div>
-      <div class="mock-dot" style="background:#febc2e"></div>
-      <div class="mock-dot" style="background:#28c840"></div>
-      <div class="mock-url">🔒 erpmanagement.wuaze.com/index.php</div>
-    </div>
-
-    <div class="dash-layout">
-      <!-- Sidebar -->
-      <div class="dash-sidebar">
-        <div class="dash-brand">
-          <div class="db-icon">🏗️</div>
-          <div class="db-text">نظام السقالات</div>
-        </div>
-        <div class="dash-nav-item active">
-          <div class="ni">📊</div><span>لوحة التحكم</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">👥</div><span>العملاء</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">🔧</div><span>المعدات</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">📋</div><span>العقود</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">🧾</div><span>الفواتير</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">💵</div><span>المدفوعات</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">💰</div><span>المصروفات</span>
-        </div>
-        <div class="dash-nav-item">
-          <div class="ni">👔</div><span>الموظفون</span>
+    <div class="cover-bottom">
+      <div class="cover-logo">
+        <div class="cover-logo-icon"><i class="bi bi-building"></i></div>
+        <div class="cover-logo-text">
+          <strong>مؤسسة الجود للسقالات</strong>
+          <span>نظام ERP متكامل لإدارة الأعمال</span>
         </div>
       </div>
-
-      <!-- Main -->
-      <div class="dash-main">
-        <div class="dash-topbar">
-          <div class="dt-title">لوحة التحكم</div>
-          <div style="display:flex;gap:8px;">
-            <div class="dt-chip">📅 14 / 03 / 2026</div>
-            <div class="dt-chip">👤 مدير النظام &nbsp;<span style="background:#dbeafe;color:#2563eb;border-radius:8px;padding:1px 6px;font-size:9px;">مدير</span></div>
-          </div>
-        </div>
-
-        <div class="dash-stats">
-          <div class="ds-card">
-            <div class="dc-icon bg-blue">📋</div>
-            <div class="dc-val">24</div>
-            <div class="dc-lbl">عقود نشطة</div>
-          </div>
-          <div class="ds-card">
-            <div class="dc-icon bg-green">💰</div>
-            <div class="dc-val">148,500</div>
-            <div class="dc-lbl">إجمالي الإيرادات</div>
-          </div>
-          <div class="ds-card">
-            <div class="dc-icon bg-amber">💵</div>
-            <div class="dc-val">32,200</div>
-            <div class="dc-lbl">المتبقي للتحصيل</div>
-          </div>
-          <div class="ds-card">
-            <div class="dc-icon bg-rose">🏦</div>
-            <div class="dc-val">18,750</div>
-            <div class="dc-lbl">مصروفات الشهر</div>
-          </div>
-        </div>
-
-        <div class="dash-row">
-          <div class="dash-card">
-            <div class="dc-head">آخر العقود <span>عرض الكل ←</span></div>
-            <table class="mini-table" width="100%">
-              <tr>
-                <th>العميل</th><th>المدة</th><th>الإجمالي</th><th>الحالة</th>
-              </tr>
-              <tr>
-                <td>شركة الإنشاءات الكبرى</td><td>30 يوم</td><td>24,000 ر.س</td>
-                <td><span class="mini-badge" style="background:#dcfce7;color:#16a34a">نشط</span></td>
-              </tr>
-              <tr>
-                <td>مؤسسة البناء الحديث</td><td>45 يوم</td><td>38,250 ر.س</td>
-                <td><span class="mini-badge" style="background:#dcfce7;color:#16a34a">نشط</span></td>
-              </tr>
-              <tr>
-                <td>مقاولات الخليج</td><td>15 يوم</td><td>9,600 ر.س</td>
-                <td><span class="mini-badge" style="background:#fee2e2;color:#dc2626">منتهي</span></td>
-              </tr>
-              <tr>
-                <td>شركة الرياض للبناء</td><td>60 يوم</td><td>52,800 ر.س</td>
-                <td><span class="mini-badge" style="background:#dcfce7;color:#16a34a">نشط</span></td>
-              </tr>
-            </table>
-          </div>
-          <div class="dash-card">
-            <div class="dc-head">الملخص المالي <span>هذا الشهر</span></div>
-            <div class="mini-list-item">
-              <span class="mli-name">💰 إجمالي الإيرادات</span>
-              <span class="mli-val">148,500 ر.س</span>
-            </div>
-            <div class="mini-list-item">
-              <span class="mli-name">✅ المحصّل</span>
-              <span class="mli-val" style="color:#16a34a">116,300 ر.س</span>
-            </div>
-            <div class="mini-list-item">
-              <span class="mli-name">⏳ المتبقي</span>
-              <span class="mli-val" style="color:#dc2626">32,200 ر.س</span>
-            </div>
-            <div class="mini-list-item">
-              <span class="mli-name">💸 المصروفات</span>
-              <span class="mli-val" style="color:#d97706">18,750 ر.س</span>
-            </div>
-            <div class="mini-list-item" style="border:none;margin-top:8px;">
-              <span class="mli-name" style="font-weight:800;color:#0b162c">🏆 صافي الربح</span>
-              <span class="mli-val" style="color:#0b162c;font-size:13px">97,550 ر.س</span>
-            </div>
-          </div>
-        </div>
+      <div class="cover-meta">
+        <strong>وثيقة سرية — للاستخدام الداخلي</strong><br>
+        الإصدار: 2.0<br>
+        تاريخ الإصدار: مارس 2026<br>
+        اللغة: العربية
       </div>
     </div>
   </div>
 </div>
-</div>
+
 
 <!-- ═══════════════════════════════════════════════
-     PAGE 4 — INVOICE + CONTRACT
+     PAGE 2 — OVERVIEW + STATS
 ════════════════════════════════════════════════ -->
 <div class="page">
-<div class="screen-page">
-  <div class="section-badge">🧾 لقطات الشاشة — الفاتورة والعقود</div>
-  <div class="screen-title">الفاتورة الإلكترونية المبسطة والعقود</div>
-  <p class="screen-desc">فاتورة إلكترونية متوافقة مع هيئة الزكاة والدخل مع رمز QR معتمد، وعرض كامل لتفاصيل العقد والمدفوعات</p>
+  <div class="page-strip">
+    <span class="ps-title"><i class="bi bi-speedometer2" style="color:#38bdf8"></i> &nbsp;نظرة عامة على النظام</span>
+    <span class="ps-num">2</span>
+  </div>
+  <div class="p-content">
 
-  <div class="two-screens">
-    <!-- Invoice Mock -->
-    <div>
-      <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:10px;letter-spacing:.5px;">🧾 الفاتورة الإلكترونية</div>
-      <div class="inv-mock">
-        <!-- Header -->
-        <div class="inv-mock-head">
+    <div class="section-label"><i class="bi bi-info-circle"></i> Overview</div>
+    <div class="section-title">ما هو <span>النظام</span>؟</div>
+    <div class="section-desc">
+      منصة إدارة أعمال متكاملة مصممة خصيصاً لشركات تأجير وبيع السقالات.
+      يغطي كامل دورة الحياة التجارية من العميل حتى الفاتورة الإلكترونية والتقارير المحاسبية.
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="ico" style="color:#38bdf8"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+        <div class="val" style="color:#38bdf8">12</div>
+        <div class="lbl">وحدة وظيفية</div>
+      </div>
+      <div class="stat-box">
+        <div class="ico" style="color:#10b981"><i class="bi bi-code-slash"></i></div>
+        <div class="val" style="color:#10b981">5,000+</div>
+        <div class="lbl">سطر برمجي</div>
+      </div>
+      <div class="stat-box">
+        <div class="ico" style="color:#f59e0b"><i class="bi bi-table"></i></div>
+        <div class="val" style="color:#f59e0b">14</div>
+        <div class="lbl">جدول قاعدة بيانات</div>
+      </div>
+      <div class="stat-box">
+        <div class="ico" style="color:#a78bfa"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div class="val" style="color:#a78bfa">100%</div>
+        <div class="lbl">استجابة فورية</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label"><i class="bi bi-layers"></i> Architecture</div>
+    <div class="section-title" style="font-size:20px;margin-bottom:20px">بنية النظام</div>
+
+    <div class="two-col" style="gap:16px">
+      <div class="hl-box" style="background:#eff6ff;border:2px solid #bfdbfe">
+        <div class="hb-icon" style="color:#1d4ed8"><i class="bi bi-display"></i></div>
+        <div>
+          <div class="hb-title" style="color:#1e3a8a">الواجهة الأمامية (Frontend)</div>
+          <div class="hb-text" style="color:#1d4ed8">
+            Bootstrap 5 RTL · Cairo Font · Bootstrap Icons<br>
+            تصميم متجاوب لجميع الشاشات<br>
+            PWA — قابل للتثبيت كتطبيق
+          </div>
+        </div>
+      </div>
+      <div class="hl-box" style="background:#f0fdf4;border:2px solid #bbf7d0">
+        <div class="hb-icon" style="color:#059669"><i class="bi bi-server"></i></div>
+        <div>
+          <div class="hb-title" style="color:#065f46">الخادم (Backend)</div>
+          <div class="hb-text" style="color:#047857">
+            PHP 8.1 · MySQL 8.0<br>
+            معالجة آمنة للبيانات وحماية SQL<br>
+            نشر تلقائي عبر GitHub Actions + FTP
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hl-box" style="background:#fdf4ff;border:2px solid #e9d5ff;margin-bottom:0">
+      <div class="hb-icon" style="color:#7c3aed"><i class="bi bi-cloud-upload-fill"></i></div>
+      <div>
+        <div class="hb-title" style="color:#581c87">الاستضافة والنشر</div>
+        <div class="hb-text" style="color:#6d28d9">
+          InfinityFree Cloud Hosting · النطاق: erpmanagement.wuaze.com<br>
+          نشر مستمر: أي تحديث يُرفع تلقائياً خلال 60 ثانية عبر CI/CD Pipeline<br>
+          قاعدة بيانات: sql212.infinityfree.com (MySQL مُشفّر)
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <strong>نظام إدارة السقالات ERP</strong>
+    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 3 — MODULES
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip">
+    <span class="ps-title"><i class="bi bi-grid-3x3-gap-fill" style="color:#38bdf8"></i> &nbsp;وحدات النظام الوظيفية</span>
+    <span class="ps-num">3</span>
+  </div>
+  <div class="p-content">
+
+    <div class="section-label"><i class="bi bi-grid"></i> Modules</div>
+    <div class="section-title">الوحدات <span>الاثنتا عشرة</span></div>
+    <div class="section-desc">كل وحدة مستقلة ومترابطة في آنٍ واحد — البيانات تتدفق تلقائياً بين الوحدات</div>
+
+    <div class="mod-grid">
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#dbeafe;color:#1d4ed8"><i class="bi bi-speedometer2"></i></div>
+        <div class="mod-name">لوحة التحكم</div>
+        <div class="mod-desc">إحصائيات فورية وبطاقات ملخص شاملة — نظرة 360° على النشاط التجاري</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#dcfce7;color:#15803d"><i class="bi bi-people-fill"></i></div>
+        <div class="mod-name">إدارة العملاء</div>
+        <div class="mod-desc">قاعدة بيانات كاملة للعملاء مع بيانات الاتصال والتاريخ التجاري</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#fff7ed;color:#ea580c"><i class="bi bi-box-seam-fill"></i></div>
+        <div class="mod-name">إدارة المعدات</div>
+        <div class="mod-desc">جرد كامل للسقالات والمعدات مع الأسعار والكميات وحالة التوفر</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#fdf4ff;color:#7c3aed"><i class="bi bi-file-earmark-text-fill"></i></div>
+        <div class="mod-name">العقود</div>
+        <div class="mod-desc">إنشاء وإدارة العقود مع حساب تلقائي للإجمالي وتتبع الحالة</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#f0fdf4;color:#059669"><i class="bi bi-cash-coin"></i></div>
+        <div class="mod-name">المدفوعات</div>
+        <div class="mod-desc">تسجيل الدفعات وربطها بالعقود مع تتبع المبالغ المستحقة والمحصّلة</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#fef9c3;color:#ca8a04"><i class="bi bi-receipt-cutoff"></i></div>
+        <div class="mod-name">الفواتير الإلكترونية</div>
+        <div class="mod-desc">فواتير متوافقة مع هيئة الزكاة والدخل مع QR Code مشفّر للتحقق</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#fef2f2;color:#dc2626"><i class="bi bi-wallet2"></i></div>
+        <div class="mod-name">المصروفات</div>
+        <div class="mod-desc">تصنيف وتتبع المصروفات مع 13 فئة قياسية وإحصائيات شهرية مفصّلة</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="mod-name">الموظفون</div>
+        <div class="mod-desc">بيانات الموظفين والرواتب مع حساب تلقائي في التقارير المالية</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-bar-chart-line-fill"></i></div>
+        <div class="mod-name">التقارير</div>
+        <div class="mod-desc">تقارير شاملة للأداء والمخزون مع إمكانية الطباعة والتصدير</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#ede9fe;color:#7c3aed"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <div class="mod-name">المحاسبة المالية</div>
+        <div class="mod-desc">أرباح وخسائر، ميزانية عمومية، ميزان مراجعة، شجرة حسابات — تلقائي 100%</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#f0f9ff;color:#0284c7"><i class="bi bi-shield-lock-fill"></i></div>
+        <div class="mod-name">إدارة المستخدمين</div>
+        <div class="mod-desc">أدوار متعددة (مدير / مستخدم) مع تشفير كلمات المرور وتحكم كامل بالصلاحيات</div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-icon" style="background:#f8fafc;color:#475569"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="mod-name">الإعدادات</div>
+        <div class="mod-desc">بيانات المنشأة، الرقم الضريبي، وميزة إعادة ضبط النظام المحمية بتأكيد مزدوج</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <strong>نظام إدارة السقالات ERP</strong>
+    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 4 — ACCOUNTING MODULE DETAIL
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-strip">
+    <span class="ps-title"><i class="bi bi-journal-bookmark-fill" style="color:#a78bfa"></i> &nbsp;وحدة المحاسبة المالية المتكاملة</span>
+    <span class="ps-num">4</span>
+  </div>
+  <div class="p-content">
+
+    <div class="section-label"><i class="bi bi-calculator"></i> Accounting</div>
+    <div class="section-title">محاسبة <span>احترافية</span> تلقائية</div>
+    <div class="section-desc">
+      تسحب البيانات تلقائياً من جميع وحدات النظام وتُنتج قوائم مالية معيارية فورياً دون أي إدخال يدوي
+    </div>
+
+    <div class="acc-grid">
+
+      <div class="acc-card" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="ac-icon" style="color:#059669"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="ac-title" style="color:#065f46">قائمة الأرباح والخسائر</div>
+        <ul>
+          <li>إيرادات الفواتير المفعّلة بالفترة</li>
+          <li>تفصيل المصروفات حسب الفئة</li>
+          <li>الرواتب × عدد أشهر الفترة</li>
+          <li>صافي الربح أو الخسارة</li>
+          <li>فلتر بالسنة والشهر</li>
+        </ul>
+      </div>
+
+      <div class="acc-card" style="border-color:#bfdbfe;background:#eff6ff">
+        <div class="ac-icon" style="color:#1d4ed8"><i class="bi bi-columns-gap"></i></div>
+        <div class="ac-title" style="color:#1e3a8a">الميزانية العمومية</div>
+        <ul>
+          <li>أصول متداولة (نقد + ذمم مدينة)</li>
+          <li>أصول ثابتة (قيمة المعدات)</li>
+          <li>خصوم وحقوق الملكية</li>
+          <li>رأس المال + الأرباح المحتجزة</li>
+          <li>فحص توازن تلقائي</li>
+        </ul>
+      </div>
+
+      <div class="acc-card" style="border-color:#fde68a;background:#fffbeb">
+        <div class="ac-icon" style="color:#d97706"><i class="bi bi-list-check"></i></div>
+        <div class="ac-title" style="color:#92400e">ميزان المراجعة</div>
+        <ul>
+          <li>جميع الحسابات بالمدين والدائن</li>
+          <li>إجمالي الميزان مع فحص التعادل</li>
+          <li>توزيع المصروفات بالنسب المئوية</li>
+          <li>أشرطة تقدم بصرية للمقارنة</li>
+          <li>تصنيف كل حساب (أصل/إيراد/مصروف)</li>
+        </ul>
+      </div>
+
+      <div class="acc-card" style="border-color:#ddd6fe;background:#fdf4ff">
+        <div class="ac-icon" style="color:#7c3aed"><i class="bi bi-diagram-3-fill"></i></div>
+        <div class="ac-title" style="color:#581c87">شجرة الحسابات</div>
+        <ul>
+          <li>دليل حسابات قياسي (1000 → 5000)</li>
+          <li>أصول، خصوم، ملكية، إيرادات، مصروفات</li>
+          <li>أرصدة حية مستخرجة من قاعدة البيانات</li>
+          <li>شرح لكل مجموعة حسابات</li>
+          <li>مبني على المعايير المحاسبية الدولية</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="hl-box" style="background:#0b162c;border:none;border-radius:14px">
+      <div class="hb-icon" style="color:#38bdf8"><i class="bi bi-magic"></i></div>
+      <div>
+        <div class="hb-title" style="color:#fff;font-size:16px">صفر تدخل يدوي — 100% تلقائي</div>
+        <div class="hb-text" style="color:#93c5fd">
+          النظام يسحب الإيرادات من الفواتير · النقدية من الدفعات · المصروفات من سجل المصروفات ·
+          الرواتب من بيانات الموظفين · قيمة الأصول من جدول المعدات.
+          لا حاجة لإدخال أي قيد محاسبي يدوياً.
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <strong>نظام إدارة السقالات ERP</strong>
+    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 5 — FEATURES & SECURITY
+════════════════════════════════════════════════ */
+<div class="page">
+  <div class="page-strip">
+    <span class="ps-title"><i class="bi bi-star-fill" style="color:#fbbf24"></i> &nbsp;المميزات والأمان</span>
+    <span class="ps-num">5</span>
+  </div>
+  <div class="p-content">
+
+    <div class="two-col">
+      <!-- FEATURES -->
+      <div>
+        <div class="section-label"><i class="bi bi-star"></i> Features</div>
+        <div class="section-title" style="font-size:20px;margin-bottom:16px">المميزات <span>الرئيسية</span></div>
+
+        <ul class="feat-list">
+          <li>
+            <span class="fi" style="color:#f59e0b"><i class="bi bi-phone-fill"></i></span>
+            <div>
+              <div class="ft">تطبيق ويب تقدمي (PWA)</div>
+              <div class="fd">يُثبَّت على الجوال ويعمل كتطبيق أصلي بدون متجر</div>
+            </div>
+          </li>
+          <li>
+            <span class="fi" style="color:#10b981"><i class="bi bi-qr-code-scan"></i></span>
+            <div>
+              <div class="ft">فاتورة إلكترونية بـ QR Code</div>
+              <div class="fd">متوافق مع متطلبات هيئة الزكاة والدخل والضرائب</div>
+            </div>
+          </li>
+          <li>
+            <span class="fi" style="color:#2563eb"><i class="bi bi-printer-fill"></i></span>
+            <div>
+              <div class="ft">طباعة احترافية لجميع المستندات</div>
+              <div class="fd">العقود، الفواتير، التقارير، القوائم المالية</div>
+            </div>
+          </li>
+          <li>
+            <span class="fi" style="color:#7c3aed"><i class="bi bi-funnel-fill"></i></span>
+            <div>
+              <div class="ft">فلاتر وبحث متقدم</div>
+              <div class="fd">تصفية بالتاريخ، الشهر، السنة، الحالة في كل وحدة</div>
+            </div>
+          </li>
+          <li>
+            <span class="fi" style="color:#dc2626"><i class="bi bi-arrow-counterclockwise"></i></span>
+            <div>
+              <div class="ft">إعادة ضبط النظام المحمية</div>
+              <div class="fd">مسح بيانات التشغيل مع الاحتفاظ بالإعدادات والمعدات</div>
+            </div>
+          </li>
+          <li>
+            <span class="fi" style="color:#0891b2"><i class="bi bi-graph-up-arrow"></i></span>
+            <div>
+              <div class="ft">لوحة تحكم ديناميكية</div>
+              <div class="fd">إحصائيات فورية وتنبيهات استحقاق العقود تلقائياً</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- SECURITY -->
+      <div>
+        <div class="section-label"><i class="bi bi-shield-check"></i> Security</div>
+        <div class="section-title" style="font-size:20px;margin-bottom:16px">الأمان <span>والحماية</span></div>
+
+        <div class="sec-item">
+          <span class="si-icon"><i class="bi bi-key-fill"></i></span>
           <div>
-            <div class="imh-name">🏗️ مؤسسة الجود للسقالات</div>
-            <div class="imh-type">فاتورة إلكترونية مبسطة</div>
-            <div style="font-size:8px;color:#93c5fd;margin-top:2px;">الرقم الضريبي: 314325455800012</div>
+            <div class="si-title">تشفير كلمات المرور</div>
+            <div class="si-text">bcrypt hashing — لا تُخزَّن كلمات المرور بصياغة قابلة للقراءة</div>
           </div>
+        </div>
+        <div class="sec-item">
+          <span class="si-icon"><i class="bi bi-person-check-fill"></i></span>
           <div>
-            <div class="imh-num">FAT-2026-0001</div>
-            <div class="imh-date">📅 تاريخ الإصدار: 2026-03-14</div>
-            <div style="margin-top:4px;">
-              <span style="background:rgba(34,197,94,.2);color:#4ade80;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:800;">✓ فاتورة نشطة</span>
-            </div>
+            <div class="si-title">نظام جلسات آمن</div>
+            <div class="si-text">Session-based authentication مع انتهاء تلقائي وتحقق في كل صفحة</div>
+          </div>
+        </div>
+        <div class="sec-item">
+          <span class="si-icon"><i class="bi bi-database-lock"></i></span>
+          <div>
+            <div class="si-title">حماية SQL Injection</div>
+            <div class="si-text">جميع المدخلات تمر بـ real_escape_string قبل أي استعلام</div>
+          </div>
+        </div>
+        <div class="sec-item">
+          <span class="si-icon"><i class="bi bi-shield-shaded"></i></span>
+          <div>
+            <div class="si-title">نظام الصلاحيات</div>
+            <div class="si-text">أدوار (Admin / User) مع منع الوصول للصفحات المقيدة تلقائياً</div>
+          </div>
+        </div>
+        <div class="sec-item">
+          <span class="si-icon"><i class="bi bi-cloud-check-fill"></i></span>
+          <div>
+            <div class="si-title">HTTPS مشفّر</div>
+            <div class="si-text">جميع البيانات تنتقل عبر SSL/TLS مشفّر بالكامل</div>
           </div>
         </div>
 
-        <!-- 3-col info row -->
-        <div class="inv-info-row">
-          <div class="inv-box">
-            <div class="inv-box-title">بيانات العميل</div>
-            <p class="v" style="font-size:10px;font-weight:900;">شركة الإنشاءات الكبرى</p>
-            <p>📞 0501234567</p>
-            <p>📍 الرياض، حي العليا</p>
-          </div>
-          <div class="qr-placeholder">
-            <!-- QR simulation -->
-            <div style="width:58px;height:58px;background:#0b162c;border-radius:3px;padding:4px;display:grid;grid-template-columns:repeat(7,1fr);gap:1.5px;">
-              <div style="background:#fff;border-radius:1px;grid-column:1/3;grid-row:1/3;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;grid-column:6/8;grid-row:1/3;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;grid-column:1/3;grid-row:6/8;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-              <div style="background:#fff;border-radius:1px;"></div>
-              <div style="background:#0b162c;border-radius:1px;"></div>
-            </div>
-            <div style="font-size:7px;color:#64748b;margin-top:4px;font-weight:700;">امسح للتحقق</div>
-          </div>
-          <div class="inv-box">
-            <div class="inv-box-title">تفاصيل العقد</div>
-            <p>رقم العقد: <span class="v">#14</span></p>
-            <p>من: <span class="v">2026-03-01</span></p>
-            <p>إلى: <span class="v">2026-03-31</span></p>
-            <p>المدة: <span class="v">30 يوم</span></p>
-          </div>
-        </div>
-
-        <!-- Items -->
-        <div class="inv-items-label">⚙️ بنود الفاتورة</div>
-        <table class="inv-items-table">
-          <tr>
-            <th>#</th><th>المعدة</th><th>الكمية</th><th>السعر/يوم</th><th>الأيام</th><th>الإجمالي</th>
-          </tr>
-          <tr>
-            <td>1</td><td>سقالة معدنية 6م</td><td>20</td><td>8.00</td><td>30</td>
-            <td style="color:#1d4ed8;font-weight:800;">4,800.00</td>
-          </tr>
-          <tr style="background:#f8fafc;">
-            <td>2</td><td>قاعدة تثبيت</td><td>40</td><td>2.50</td><td>30</td>
-            <td style="color:#1d4ed8;font-weight:800;">3,000.00</td>
-          </tr>
-        </table>
-
-        <!-- Totals -->
-        <div class="inv-totals">
-          <table class="inv-tot-table">
-            <tr>
-              <td style="background:#f8fafc;color:#64748b;">إجمالي الفاتورة</td>
-              <td style="text-align:center;font-weight:700;">7,800.00 ر.س</td>
-            </tr>
-            <tr>
-              <td style="background:#f8fafc;color:#64748b;">المدفوع</td>
-              <td style="text-align:center;color:#16a34a;font-weight:700;">5,000.00 ر.س</td>
-            </tr>
-            <tr>
-              <td>المتبقي</td>
-              <td style="text-align:center;">2,800.00 ر.س</td>
-            </tr>
-          </table>
-        </div>
       </div>
     </div>
 
-    <!-- Contract Mock -->
-    <div>
-      <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:10px;letter-spacing:.5px;">📋 عرض العقد</div>
-      <div class="contract-mock">
-        <div class="cm-head">
-          <div class="cmh-title">📋 العقد رقم #14</div>
-          <div class="cmh-badge">✓ نشط</div>
-        </div>
-        <div class="cm-body">
-          <div class="cm-grid">
-            <div class="cm-info-card">
-              <div class="ci-title">📋 بيانات العقد</div>
-              <div class="cm-info-row"><span class="label">العميل</span><span class="value">شركة الإنشاءات</span></div>
-              <div class="cm-info-row"><span class="label">البداية</span><span class="value">2026-03-01</span></div>
-              <div class="cm-info-row"><span class="label">الانتهاء</span><span class="value">2026-03-31</span></div>
-              <div class="cm-info-row"><span class="label">المدة</span><span class="value">30 يوم</span></div>
-            </div>
-            <div class="cm-info-card">
-              <div class="ci-title">💰 الملخص المالي</div>
-              <div class="cm-info-row"><span class="label">الإجمالي</span><span class="value">7,800 ر.س</span></div>
-              <div class="cm-info-row"><span class="label">المدفوع</span><span class="value" style="color:#16a34a">5,000 ر.س</span></div>
-              <div class="cm-info-row"><span class="label">المتبقي</span><span class="value" style="color:#dc2626">2,800 ر.س</span></div>
-              <div class="cm-prog-wrap">
-                <div class="cm-prog" style="width:64%">64% مدفوع</div>
-              </div>
-            </div>
-          </div>
-
-          <div style="font-size:10px;font-weight:800;color:#0b162c;margin-bottom:8px;">⚙️ بنود المعدات</div>
-          <table class="cm-table" width="100%">
-            <tr><th>المعدة</th><th>الكمية</th><th>السعر/يوم</th><th>الإجمالي</th></tr>
-            <tr><td>سقالة معدنية 6م</td><td>20</td><td>8.00</td><td>4,800 ر.س</td></tr>
-            <tr><td>قاعدة تثبيت</td><td>40</td><td>2.50</td><td>3,000 ر.س</td></tr>
-          </table>
-
-          <div style="font-size:10px;font-weight:800;color:#0b162c;margin:10px 0 8px;">💵 سجل الدفعات</div>
-          <table class="cm-table" width="100%">
-            <tr><th>التاريخ</th><th>المبلغ</th><th>الطريقة</th></tr>
-            <tr><td>2026-03-05</td><td style="color:#16a34a;font-weight:700;">3,000 ر.س</td><td>تحويل بنكي</td></tr>
-            <tr><td>2026-03-15</td><td style="color:#16a34a;font-weight:700;">2,000 ر.س</td><td>نقدي</td></tr>
-          </table>
-        </div>
-      </div>
-    </div>
+  </div>
+  <div class="page-footer">
+    <strong>نظام إدارة السقالات ERP</strong>
+    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
-</div>
+
 
 <!-- ═══════════════════════════════════════════════
-     PAGE 5 — BENEFITS & CTA
+     PAGE 6 — TECH STACK
 ════════════════════════════════════════════════ -->
 <div class="page">
-<div class="page-inner">
-  <div class="section-badge">✨ مزايا النظام</div>
-  <div class="page-title">لماذا <span>نظام الجود</span> ERP؟</div>
-  <p class="page-desc">مزايا تنافسية مصممة لتوفير الوقت وزيادة الكفاءة التشغيلية وضمان الامتثال للمتطلبات التنظيمية</p>
-
-  <div class="benefits-grid">
-    <div class="benefit-card">
-      <div class="benefit-icon bg-blue">⚡</div>
-      <div>
-        <h3>سرعة وكفاءة عالية</h3>
-        <p>إنشاء عقد كامل مع حساب الإجمالي وإصدار الفاتورة الإلكترونية في أقل من دقيقتين، مع حفظ تلقائي لجميع البيانات</p>
-      </div>
-    </div>
-    <div class="benefit-card">
-      <div class="benefit-icon bg-green">🏛️</div>
-      <div>
-        <h3>امتثال كامل لـ ZATCA</h3>
-        <p>فواتير إلكترونية مبسطة متوافقة مع متطلبات هيئة الزكاة والدخل، مع رمز QR مشفر بصيغة TLV+Base64 المعتمدة</p>
-      </div>
-    </div>
-    <div class="benefit-card">
-      <div class="benefit-icon bg-purple">🔒</div>
-      <div>
-        <h3>أمان وتحكم في الصلاحيات</h3>
-        <p>نظام مستخدمين متعدد الأدوار (مدير / مستخدم) مع تشفير كلمات المرور وحماية كاملة للبيانات</p>
-      </div>
-    </div>
-    <div class="benefit-card">
-      <div class="benefit-icon bg-amber">📱</div>
-      <div>
-        <h3>وصول من أي مكان</h3>
-        <p>واجهة متجاوبة تعمل على جميع الأجهزة (جوال، تابلت، حاسوب) مع استضافة سحابية دائمة الاتاحة</p>
-      </div>
-    </div>
-    <div class="benefit-card">
-      <div class="benefit-icon bg-teal">📊</div>
-      <div>
-        <h3>تقارير وإحصائيات فورية</h3>
-        <p>لوحة تحكم تعرض الإيرادات والمصروفات والمتبقي والعقود النشطة في لمحة واحدة بدون أي جداول يدوية</p>
-      </div>
-    </div>
-    <div class="benefit-card">
-      <div class="benefit-icon bg-rose">🚀</div>
-      <div>
-        <h3>تحديثات تلقائية مستمرة</h3>
-        <p>نشر تلقائي عبر GitHub Actions — أي تحديث أو تطوير يصل للموقع فوراً بدون أي تدخل يدوي</p>
-      </div>
-    </div>
+  <div class="page-strip">
+    <span class="ps-title"><i class="bi bi-cpu-fill" style="color:#34d399"></i> &nbsp;التقنيات والبنية التحتية</span>
+    <span class="ps-num">6</span>
   </div>
+  <div class="p-content">
 
-  <div class="cta-box">
-    <h2>🏗️ مؤسسة الجود للسقالات</h2>
-    <p>
-      نظام إدارة متكامل يعكس الاحترافية والتميز في كل تفاصيل العمل<br>
-      من إنشاء العقد حتى إصدار الفاتورة المعتمدة وتحصيل المدفوعات
-    </p>
-    <div class="cta-info">
-      <div class="cta-chip">🌐 <span>erpmanagement.wuaze.com</span></div>
-      <div class="cta-chip">🏢 <span>مؤسسة الجود للسقالات</span></div>
-      <div class="cta-chip">📋 <span>الرقم الضريبي: 314325455800012</span></div>
-    </div>
+    <div class="section-label"><i class="bi bi-code-square"></i> Tech Stack</div>
+    <div class="section-title">المكدس <span>التقني</span></div>
+    <div class="section-desc">تقنيات حديثة ومثبتة في بيئات الإنتاج العالمية</div>
 
-    <div style="margin-top:32px;border-top:1px solid rgba(255,255,255,.1);padding-top:28px;">
-      <div style="font-size:11px;color:#475569;font-weight:700;margin-bottom:12px;letter-spacing:1px;">تم التطوير بواسطة</div>
-      <div style="font-size:20px;font-weight:900;color:#fbbf24;margin-bottom:8px;">
-        💡 التقنية المرنة لنظم المعلومات
-      </div>
-      <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
-        <div style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:10px 22px;color:#fbbf24;font-size:14px;font-weight:700;">
-          📞 0543717265
-        </div>
-        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 22px;color:#e2e8f0;font-size:13px;font-weight:600;">
-          حلول برمجية متكاملة للمنشآت السعودية
+    <div class="tech-grid" style="margin-bottom:28px">
+
+      <div class="tech-card" style="background:#fff7ed;border-color:#fed7aa">
+        <span class="tech-icon">🐘</span>
+        <div>
+          <div class="tech-name">PHP 8.1</div>
+          <div class="tech-desc">
+            الخادم الخلفي الرئيسي · معالجة الطلبات وقواعد البيانات والمصادقة.
+            يعتمد على PHP الحديث مع دعم كامل للـ OOP والدوال المساعدة.
+          </div>
         </div>
       </div>
+
+      <div class="tech-card" style="background:#f0fdf4;border-color:#bbf7d0">
+        <span class="tech-icon">🐬</span>
+        <div>
+          <div class="tech-name">MySQL 8.0</div>
+          <div class="tech-desc">
+            قاعدة البيانات الرئيسية · 14 جدول مترابط بعلاقات FK.
+            ترميز UTF-8mb4 للعربية بشكل كامل وصحيح.
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card" style="background:#eff6ff;border-color:#bfdbfe">
+        <span class="tech-icon" style="font-size:22px">🅱️</span>
+        <div>
+          <div class="tech-name">Bootstrap 5 RTL</div>
+          <div class="tech-desc">
+            إطار CSS الرائد · دعم RTL كامل للعربية.
+            شبكة استجابة تعمل على الجوال والتابلت والكمبيوتر.
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card" style="background:#fdf4ff;border-color:#e9d5ff">
+        <span class="tech-icon">⚡</span>
+        <div>
+          <div class="tech-name">PWA — Progressive Web App</div>
+          <div class="tech-desc">
+            Service Worker + Web Manifest · يُثبَّت على الجوال.
+            يعمل على iOS وAndroid كتطبيق أصلي بدون متجر تطبيقات.
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card" style="background:#f0fdf4;border-color:#bbf7d0">
+        <span class="tech-icon">🔄</span>
+        <div>
+          <div class="tech-name">GitHub Actions CI/CD</div>
+          <div class="tech-desc">
+            نشر تلقائي عند كل تحديث · FTP Deploy Action.
+            دورة النشر الكاملة في أقل من 60 ثانية تلقائياً.
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-card" style="background:#fff9f0;border-color:#fde68a">
+        <span class="tech-icon">🔒</span>
+        <div>
+          <div class="tech-name">SSL/TLS + HTTPS</div>
+          <div class="tech-desc">
+            اتصال مشفّر بالكامل · شهادة SSL مجانية.
+            جميع البيانات المنقولة محمية من الاعتراض.
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label"><i class="bi bi-database"></i> Database Schema</div>
+    <div class="section-title" style="font-size:20px;margin-bottom:16px">هيكل قاعدة البيانات</div>
+
+    <table class="sum-table">
+      <thead>
+        <tr>
+          <th>اسم الجدول</th>
+          <th>الغرض</th>
+          <th>الحقول الرئيسية</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>clients</td><td>بيانات العملاء</td><td>name, phone, address</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>equipment</td><td>المعدات والسقالات</td><td>name, quantity, price_day, status</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>contracts</td><td>عقود الإيجار</td><td>client_id, total, start/end_date</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>contract_items</td><td>بنود العقد</td><td>contract_id, equipment_id, qty, price</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>invoices</td><td>الفواتير الإلكترونية</td><td>invoice_number, total, status</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>payments</td><td>الدفعات</td><td>contract_id, amount, method</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>expenses</td><td>المصروفات</td><td>category_id, amount, notes, date</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>expense_categories</td><td>فئات المصروفات</td><td>name, sort_order</td><td><span class="badge badge-blue">إعداد</span></td></tr>
+        <tr><td>employees</td><td>الموظفون</td><td>name, salary, position</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>users</td><td>مستخدمو النظام</td><td>username, password_hash, role</td><td><span class="badge badge-green">نشط</span></td></tr>
+        <tr><td>settings</td><td>إعدادات النظام</td><td>setting_key, setting_value</td><td><span class="badge badge-blue">إعداد</span></td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="page-footer">
+    <strong>نظام إدارة السقالات ERP</strong>
+    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PAGE 7 — CONCLUSION
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="conclusion">
+    <div style="position:relative;width:100%">
+
+      <div style="margin-bottom:12px">
+        <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:8px 20px;color:#38bdf8;font-size:12px;font-weight:700;letter-spacing:1px">
+          <i class="bi bi-check-circle-fill"></i> جاهز للتشغيل الفوري
+        </span>
+      </div>
+
+      <div class="con-big">
+        النظام <span>جاهز</span><br>ومُشغَّل الآن
+      </div>
+      <div class="con-sub">
+        يعمل على الإنترنت · متاح 24/7 · لا يحتاج تثبيتاً
+      </div>
+
+      <div class="con-cards">
+        <div class="con-card">
+          <div class="cc-val">12</div>
+          <div class="cc-lbl">وحدة وظيفية</div>
+        </div>
+        <div class="con-card">
+          <div class="cc-val">100%</div>
+          <div class="cc-lbl">تلقائي</div>
+        </div>
+        <div class="con-card">
+          <div class="cc-val">PWA</div>
+          <div class="cc-lbl">يعمل على الجوال</div>
+        </div>
+      </div>
+
+      <div class="con-contact">
+        <p>🌐 الرابط المباشر للنظام</p>
+        <strong>https://erpmanagement.wuaze.com</strong>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)">
+          <p style="margin-bottom:4px">بيانات الدخول التجريبية</p>
+          <strong>المستخدم: admin &nbsp;|&nbsp; كلمة المرور: admin123</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 </body>
