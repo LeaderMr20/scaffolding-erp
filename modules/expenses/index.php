@@ -3,25 +3,45 @@ include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
-// Auto-create expense_categories table
+// ── Ensure tables exist ────────────────────────────
+$conn->query("CREATE TABLE IF NOT EXISTS settings (
+    name VARCHAR(100) PRIMARY KEY,
+    value TEXT
+)");
+
 $conn->query("CREATE TABLE IF NOT EXISTS expense_categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     sort_order INT DEFAULT 0
 )");
 
-// Migration v2: replace old categories with new standard set
-if (!function_exists('getSetting') || !getSetting($conn, 'cats_v2')) {
-    $newCats = ['إيجار','أجور ورواتب','نثريات','مصاريف تشغيل','كهرباء','ماء','مشتريات','أخرى'];
-    $conn->query("TRUNCATE TABLE expense_categories");
-    foreach ($newCats as $i => $name) {
+// Add notes column to expenses if missing
+$conn->query("ALTER TABLE expenses ADD COLUMN IF NOT EXISTS notes TEXT");
+$conn->query("ALTER TABLE expenses ADD COLUMN IF NOT EXISTS category_id INT DEFAULT NULL");
+
+// ── Seed default categories once ──────────────────
+$catsSetting = $conn->query("SELECT value FROM settings WHERE name='cats_v2'")->fetch_assoc();
+if (!$catsSetting) {
+    $defaultCats = [
+        'إيجار',
+        'أجور ورواتب',
+        'نثريات',
+        'مصاريف تشغيل',
+        'كهرباء وماء',
+        'وقود ومواصلات',
+        'مشتريات ومواد',
+        'صيانة وإصلاح',
+        'اتصالات وإنترنت',
+        'أخرى',
+    ];
+    foreach ($defaultCats as $i => $name) {
         $n = $conn->real_escape_string($name);
         $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$n', " . ($i+1) . ")");
     }
     $conn->query("INSERT INTO settings(name,value) VALUES('cats_v2','1') ON DUPLICATE KEY UPDATE value='1'");
 }
 
-// ── Manage Categories ─────────────────────────────
+// ── Manage Categories ──────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_cat') {
     $name = $conn->real_escape_string(trim($_POST['cat_name']));
     if ($name) {
@@ -44,55 +64,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
     exit;
 }
 
-// ── Add Expense ───────────────────────────────────
+// ── Add Expense ────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
+    $catId  = (int)$_POST['category_id'];
     $title  = $conn->real_escape_string(trim($_POST['title']));
+    $notes  = $conn->real_escape_string(trim($_POST['notes'] ?? ''));
     $amount = (float)$_POST['amount'];
     $date   = $conn->real_escape_string($_POST['expense_date']);
-    $conn->query("INSERT INTO expenses(title, amount, expense_date) VALUES('$title', $amount, '$date')");
+    // Get category name as title if no custom title
+    if (!$title && $catId) {
+        $r = $conn->query("SELECT name FROM expense_categories WHERE id=$catId")->fetch_assoc();
+        $title = $conn->real_escape_string($r['name'] ?? '');
+    }
+    $conn->query("INSERT INTO expenses(title, notes, amount, expense_date, category_id)
+                  VALUES('$title', '$notes', $amount, '$date', " . ($catId ?: 'NULL') . ")");
     header('Location: index.php?ok=added&month=' . substr($date, 0, 7));
     exit;
 }
 
-// ── Edit Expense ──────────────────────────────────
+// ── Edit Expense ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
     $id     = (int)$_POST['id'];
+    $catId  = (int)$_POST['category_id'];
     $title  = $conn->real_escape_string(trim($_POST['title']));
+    $notes  = $conn->real_escape_string(trim($_POST['notes'] ?? ''));
     $amount = (float)$_POST['amount'];
     $date   = $conn->real_escape_string($_POST['expense_date']);
-    $conn->query("UPDATE expenses SET title='$title', amount=$amount, expense_date='$date' WHERE id=$id");
+    if (!$title && $catId) {
+        $r = $conn->query("SELECT name FROM expense_categories WHERE id=$catId")->fetch_assoc();
+        $title = $conn->real_escape_string($r['name'] ?? '');
+    }
+    $conn->query("UPDATE expenses SET title='$title', notes='$notes', amount=$amount,
+                  expense_date='$date', category_id=" . ($catId ?: 'NULL') . " WHERE id=$id");
     header('Location: index.php?ok=edited&month=' . substr($date, 0, 7));
     exit;
 }
 
-// ── Delete Expense ────────────────────────────────
+// ── Delete Expense ─────────────────────────────────
 if (isset($_GET['del'])) {
     $conn->query("DELETE FROM expenses WHERE id=" . (int)$_GET['del']);
     header('Location: index.php?ok=deleted&month=' . ($_GET['month'] ?? date('Y-m')));
     exit;
 }
 
-// ── Data ──────────────────────────────────────────
+// ── Data ───────────────────────────────────────────
 $month = $_GET['month'] ?? date('Y-m');
 [$y, $m] = explode('-', $month);
-$where = "WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m";
+$where = "WHERE YEAR(e.expense_date)=$y AND MONTH(e.expense_date)=$m";
 
-$expenses   = $conn->query("SELECT * FROM expenses $where ORDER BY expense_date DESC, id DESC");
-$totalMonth = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses $where")->fetch_assoc()['s'];
+$expenses = $conn->query("
+    SELECT e.*, ec.name AS cat_name
+    FROM expenses e
+    LEFT JOIN expense_categories ec ON e.category_id = ec.id
+    $where
+    ORDER BY e.expense_date DESC, e.id DESC
+");
+$totalMonth = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m")->fetch_assoc()['s'];
 $totalAll   = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses")->fetch_assoc()['s'];
-$countMonth = (int)$conn->query("SELECT COUNT(*) c FROM expenses $where")->fetch_assoc()['c'];
+$countMonth = (int)$conn->query("SELECT COUNT(*) c FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m")->fetch_assoc()['c'];
+
 $categories = $conn->query("SELECT * FROM expense_categories ORDER BY sort_order, name");
 $cats = [];
 while ($c = $categories->fetch_assoc()) $cats[] = $c;
+
+// Category totals for chart
+$catTotals = $conn->query("
+    SELECT ec.name, COALESCE(SUM(e.amount),0) total
+    FROM expense_categories ec
+    LEFT JOIN expenses e ON e.category_id = ec.id
+        AND YEAR(e.expense_date)=$y AND MONTH(e.expense_date)=$m
+    GROUP BY ec.id, ec.name
+    HAVING total > 0
+    ORDER BY total DESC
+");
+$catData = [];
+while ($r = $catTotals->fetch_assoc()) $catData[] = $r;
 
 $activeTab = $_GET['tab'] ?? 'list';
 
 include '../../templates/header.php';
 ?>
-
-<style>
-select.form-select { font-family: 'Cairo', sans-serif; }
-</style>
 
 <!-- Page header -->
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -104,8 +155,8 @@ select.form-select { font-family: 'Cairo', sans-serif; }
     <a href="?tab=cats" class="btn btn-outline-secondary <?= $activeTab==='cats' ? 'active' : '' ?>">
       <i class="bi bi-tags me-1"></i> إدارة الفئات
     </a>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-      <i class="bi bi-plus-lg me-1"></i> إضافة مصروف
+    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addModal">
+      <i class="bi bi-plus-lg me-1"></i> تسجيل مصروف
     </button>
   </div>
 </div>
@@ -134,8 +185,15 @@ select.form-select { font-family: 'Cairo', sans-serif; }
             <label class="form-label fw-bold">اسم الفئة</label>
             <input type="text" name="cat_name" class="form-control" placeholder="مثال: وقود" required>
           </div>
-          <button class="btn btn-primary w-100"><i class="bi bi-save me-1"></i> حفظ</button>
+          <button class="btn btn-primary w-100"><i class="bi bi-save me-1"></i> حفظ الفئة</button>
         </form>
+      </div>
+    </div>
+
+    <div class="card mt-3" style="background:#f8fafc;border:1.5px dashed #cbd5e1">
+      <div class="card-body text-center py-3">
+        <i class="bi bi-lightbulb text-warning fs-4"></i>
+        <p class="mb-0 mt-2 text-muted small">الفئات تُستخدم لتصنيف المصروفات وعرض الإحصائيات. يمكنك تعديل أو حذف أي فئة.</p>
       </div>
     </div>
   </div>
@@ -144,25 +202,28 @@ select.form-select { font-family: 'Cairo', sans-serif; }
   <div class="col-md-8">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-tags me-2 text-secondary"></i>قائمة الفئات</span>
+        <span><i class="bi bi-tags me-2 text-secondary"></i>الفئات الأساسية</span>
         <span class="badge bg-secondary"><?= count($cats) ?> فئة</span>
       </div>
       <div class="card-body p-0">
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th>#</th>
+              <th style="width:40px">#</th>
               <th>اسم الفئة</th>
-              <th style="width:130px"></th>
+              <th style="width:140px" class="text-center">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($cats as $i => $cat): ?>
             <tr>
               <td class="text-muted"><?= $i + 1 ?></td>
-              <td class="fw-bold"><?= htmlspecialchars($cat['name']) ?></td>
               <td>
-                <div class="d-flex gap-1">
+                <i class="bi bi-tag text-secondary me-2"></i>
+                <span class="fw-bold"><?= htmlspecialchars($cat['name']) ?></span>
+              </td>
+              <td class="text-center">
+                <div class="d-flex gap-1 justify-content-center">
                   <button class="btn btn-sm btn-outline-primary"
                           onclick="openEditCat(<?= $cat['id'] ?>, '<?= addslashes(htmlspecialchars($cat['name'])) ?>')"
                           title="تعديل">
@@ -233,6 +294,35 @@ select.form-select { font-family: 'Cairo', sans-serif; }
   </div>
 </div>
 
+<!-- Category Totals (if any) -->
+<?php if (!empty($catData)): ?>
+<div class="card mb-4">
+  <div class="card-header"><i class="bi bi-bar-chart me-2 text-primary"></i>توزيع المصروفات حسب الفئة</div>
+  <div class="card-body">
+    <div class="row g-2">
+      <?php
+      $colors = ['#dc2626','#d97706','#059669','#2563eb','#7c3aed','#db2777','#0891b2','#65a30d','#ea580c','#6366f1'];
+      foreach ($catData as $ci => $cd):
+        $pct = $totalMonth > 0 ? round($cd['total'] / $totalMonth * 100) : 0;
+        $clr = $colors[$ci % count($colors)];
+      ?>
+      <div class="col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span style="width:12px;height:12px;border-radius:50%;background:<?= $clr ?>;flex-shrink:0"></span>
+          <span class="fw-bold small flex-grow-1"><?= htmlspecialchars($cd['name']) ?></span>
+          <span class="small text-muted"><?= number_format($cd['total'], 2) ?> ر.س</span>
+          <span class="badge" style="background:<?= $clr ?>20;color:<?= $clr ?>;font-size:11px"><?= $pct ?>%</span>
+        </div>
+        <div class="progress" style="height:6px;border-radius:4px">
+          <div class="progress-bar" style="width:<?= $pct ?>%;background:<?= $clr ?>;border-radius:4px"></div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
@@ -244,9 +334,10 @@ select.form-select { font-family: 'Cairo', sans-serif; }
       <thead>
         <tr>
           <th style="width:50px">#</th>
-          <th>الوصف / الفئة</th>
+          <th>الفئة</th>
+          <th>ملاحظات</th>
           <th style="width:180px">المبلغ</th>
-          <th style="width:150px">التاريخ</th>
+          <th style="width:140px">التاريخ</th>
           <th style="width:110px"></th>
         </tr>
       </thead>
@@ -255,18 +346,21 @@ select.form-select { font-family: 'Cairo', sans-serif; }
         <tr>
           <td class="text-muted"><?= $n++ ?></td>
           <td>
-            <div class="fw-bold"><?= htmlspecialchars($row['title']) ?></div>
+            <span class="badge" style="background:#fee2e2;color:#dc2626;font-size:12px;padding:5px 12px">
+              <i class="bi bi-tag me-1"></i><?= htmlspecialchars($row['cat_name'] ?? $row['title']) ?>
+            </span>
           </td>
+          <td class="text-muted small"><?= $row['notes'] ? htmlspecialchars($row['notes']) : '<span class="text-muted">—</span>' ?></td>
           <td>
-            <span class="badge" style="background:#fee2e2;color:#dc2626;font-size:13px;padding:6px 14px">
+            <span class="fw-bold" style="color:#dc2626">
               <?= number_format($row['amount'], 2) ?> ر.س
             </span>
           </td>
-          <td><i class="bi bi-calendar3 me-1 text-muted"></i><?= $row['expense_date'] ?></td>
+          <td class="text-muted small"><i class="bi bi-calendar3 me-1"></i><?= $row['expense_date'] ?></td>
           <td>
             <div class="d-flex gap-1">
               <button class="btn btn-sm btn-outline-primary"
-                      onclick="openEdit(<?= $row['id'] ?>, '<?= addslashes(htmlspecialchars($row['title'])) ?>', <?= $row['amount'] ?>, '<?= $row['expense_date'] ?>')"
+                      onclick="openEdit(<?= $row['id'] ?>, <?= (int)($row['category_id'] ?? 0) ?>, '<?= addslashes(htmlspecialchars($row['notes'] ?? '')) ?>', <?= $row['amount'] ?>, '<?= $row['expense_date'] ?>')"
                       title="تعديل">
                 <i class="bi bi-pencil"></i>
               </button>
@@ -282,12 +376,12 @@ select.form-select { font-family: 'Cairo', sans-serif; }
         <?php endwhile; ?>
         <?php if (!$hasRows): ?>
         <tr>
-          <td colspan="5" class="text-center py-5 text-muted">
+          <td colspan="6" class="text-center py-5 text-muted">
             <i class="bi bi-wallet2 fs-2 d-block mb-2 text-danger opacity-25"></i>
             لا توجد مصروفات مسجلة لهذا الشهر
             <br>
-            <button class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#addModal">
-              <i class="bi bi-plus-lg me-1"></i> أضف أول مصروف
+            <button class="btn btn-danger btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#addModal">
+              <i class="bi bi-plus-lg me-1"></i> سجّل أول مصروف
             </button>
           </td>
         </tr>
@@ -296,9 +390,8 @@ select.form-select { font-family: 'Cairo', sans-serif; }
       <?php if ($hasRows): ?>
       <tfoot>
         <tr style="background:#fff7f7">
-          <td colspan="2" class="text-end fw-bold text-muted">إجمالي الشهر:</td>
-          <td><span class="fw-bold text-danger"><?= number_format($totalMonth, 2) ?> ر.س</span></td>
-          <td colspan="2"></td>
+          <td colspan="3" class="text-end fw-bold text-muted">إجمالي الشهر:</td>
+          <td colspan="3"><span class="fw-bold text-danger fs-6"><?= number_format($totalMonth, 2) ?> ر.س</span></td>
         </tr>
       </tfoot>
       <?php endif; ?>
@@ -308,30 +401,44 @@ select.form-select { font-family: 'Cairo', sans-serif; }
 
 <?php endif; ?>
 
-<!-- ── Add Modal ─────────────────────────────────── -->
+<!-- ── Add Expense Modal ──────────────────────────── -->
 <div class="modal fade" id="addModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:16px;border:none">
-      <div class="modal-header" style="background:#0b162c;color:#fff;border-radius:16px 16px 0 0">
-        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>إضافة مصروف جديد</h5>
+      <div class="modal-header" style="background:#be123c;color:#fff;border-radius:16px 16px 0 0">
+        <h5 class="modal-title"><i class="bi bi-wallet2 me-2"></i>تسجيل مصروف جديد</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form method="post">
         <input type="hidden" name="action" value="add">
         <div class="modal-body p-4">
+
           <div class="mb-3">
-            <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
-            <select name="title" class="form-select" required>
-              <option value="" disabled selected>-- اختر الفئة --</option>
+            <label class="form-label fw-bold">الفئة <span class="text-danger">*</span></label>
+            <select name="category_id" id="addCatSelect" class="form-select" required onchange="fillTitle(this)">
+              <option value="" disabled selected>-- اختر فئة المصروف --</option>
               <?php foreach ($cats as $cat): ?>
-              <option value="<?= htmlspecialchars($cat['name']) ?>"><?= htmlspecialchars($cat['name']) ?></option>
+              <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
               <?php endforeach; ?>
             </select>
-            <div class="form-text">
-              <i class="bi bi-tags me-1 text-secondary"></i>
-              يمكنك إضافة فئات من <a href="?tab=cats">إدارة الفئات</a>
+            <input type="hidden" name="title" id="addTitle">
+            <?php if (empty($cats)): ?>
+            <div class="form-text text-danger">
+              <i class="bi bi-exclamation-triangle me-1"></i>
+              لا توجد فئات. <a href="?tab=cats">أضف فئة أولاً</a>
             </div>
+            <?php else: ?>
+            <div class="form-text">
+              <a href="?tab=cats" target="_blank"><i class="bi bi-tags me-1"></i>إدارة الفئات</a>
+            </div>
+            <?php endif; ?>
           </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">ملاحظات / تفاصيل <span class="text-muted fw-normal">(اختياري)</span></label>
+            <input type="text" name="notes" class="form-control" placeholder="مثال: فاتورة شهر مارس، دفعة سائق...">
+          </div>
+
           <div class="row g-3">
             <div class="col-6">
               <label class="form-label fw-bold">المبلغ (ر.س) <span class="text-danger">*</span></label>
@@ -342,11 +449,12 @@ select.form-select { font-family: 'Cairo', sans-serif; }
               <input type="date" name="expense_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
             </div>
           </div>
+
         </div>
         <div class="modal-footer border-0 pt-0">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
-          <button type="submit" class="btn btn-primary px-4">
-            <i class="bi bi-save me-1"></i> حفظ
+          <button type="submit" class="btn btn-danger px-4">
+            <i class="bi bi-save me-1"></i> حفظ المصروف
           </button>
         </div>
       </form>
@@ -366,15 +474,23 @@ select.form-select { font-family: 'Cairo', sans-serif; }
         <input type="hidden" name="action" value="edit">
         <input type="hidden" name="id" id="editId">
         <div class="modal-body p-4">
+
           <div class="mb-3">
-            <label class="form-label fw-bold">الفئة / وصف المصروف <span class="text-danger">*</span></label>
-            <select name="title" id="editTitle" class="form-select" required>
-              <option value="" disabled>-- اختر الفئة --</option>
+            <label class="form-label fw-bold">الفئة <span class="text-danger">*</span></label>
+            <select name="category_id" id="editCatId" class="form-select" required onchange="fillEditTitle(this)">
+              <option value="" disabled>-- اختر فئة المصروف --</option>
               <?php foreach ($cats as $cat): ?>
-              <option value="<?= htmlspecialchars($cat['name']) ?>"><?= htmlspecialchars($cat['name']) ?></option>
+              <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
               <?php endforeach; ?>
             </select>
+            <input type="hidden" name="title" id="editTitle">
           </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">ملاحظات / تفاصيل <span class="text-muted fw-normal">(اختياري)</span></label>
+            <input type="text" name="notes" id="editNotes" class="form-control" placeholder="مثال: فاتورة شهر مارس...">
+          </div>
+
           <div class="row g-3">
             <div class="col-6">
               <label class="form-label fw-bold">المبلغ (ر.س) <span class="text-danger">*</span></label>
@@ -385,6 +501,7 @@ select.form-select { font-family: 'Cairo', sans-serif; }
               <input type="date" name="expense_date" id="editDate" class="form-control" required>
             </div>
           </div>
+
         </div>
         <div class="modal-footer border-0 pt-0">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
@@ -407,7 +524,7 @@ select.form-select { font-family: 'Cairo', sans-serif; }
       </div>
       <form method="post">
         <input type="hidden" name="action" value="edit_cat">
-        <input type="hidden" name="cat_id" id="editCatId">
+        <input type="hidden" name="cat_id" id="editCatModalId">
         <div class="modal-body p-4">
           <label class="form-label fw-bold">اسم الفئة</label>
           <input type="text" name="cat_name" id="editCatName" class="form-control" required>
@@ -424,19 +541,36 @@ select.form-select { font-family: 'Cairo', sans-serif; }
 </div>
 
 <script>
-function openEdit(id, title, amount, date) {
-    document.getElementById('editId').value     = id;
-    document.getElementById('editAmount').value = amount;
-    document.getElementById('editDate').value   = date;
-    var sel = document.getElementById('editTitle');
+// Fill hidden title from selected category
+var catNames = {
+<?php foreach ($cats as $cat): ?>
+    <?= $cat['id'] ?>: '<?= addslashes(htmlspecialchars($cat['name'])) ?>',
+<?php endforeach; ?>
+};
+
+function fillTitle(sel) {
+    document.getElementById('addTitle').value = catNames[sel.value] || '';
+}
+function fillEditTitle(sel) {
+    document.getElementById('editTitle').value = catNames[sel.value] || '';
+}
+
+function openEdit(id, catId, notes, amount, date) {
+    document.getElementById('editId').value      = id;
+    document.getElementById('editAmount').value  = amount;
+    document.getElementById('editDate').value    = date;
+    document.getElementById('editNotes').value   = notes;
+    document.getElementById('editTitle').value   = catNames[catId] || '';
+    var sel = document.getElementById('editCatId');
     for (var i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value === title) { sel.selectedIndex = i; break; }
+        if (sel.options[i].value == catId) { sel.selectedIndex = i; break; }
     }
     new bootstrap.Modal(document.getElementById('editModal')).show();
 }
+
 function openEditCat(id, name) {
-    document.getElementById('editCatId').value   = id;
-    document.getElementById('editCatName').value = name;
+    document.getElementById('editCatModalId').value = id;
+    document.getElementById('editCatName').value    = name;
     new bootstrap.Modal(document.getElementById('editCatModal')).show();
 }
 </script>

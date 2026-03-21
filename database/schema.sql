@@ -59,7 +59,20 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 CREATE TABLE expenses(
 id INT AUTO_INCREMENT PRIMARY KEY,
+category_id INT DEFAULT NULL,
 title VARCHAR(200),
+notes TEXT,
 amount DECIMAL(10,2),
 expense_date DATE
+);
+
+CREATE TABLE expense_categories(
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(200) NOT NULL,
+sort_order INT DEFAULT 0
+);
+
+CREATE TABLE settings(
+name VARCHAR(100) PRIMARY KEY,
+value TEXT
 );
