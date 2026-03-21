@@ -565,6 +565,12 @@ select option { color: #1e293b !important; background: #ffffff !important; direc
         <div class="nav-text">التقارير والمخزون</div>
       </a>
     </li>
+    <li>
+      <a href="<?= $base ?>modules/accounting/index.php" class="<?= isActive('/accounting/') ?>" title="المحاسبة">
+        <div class="nav-icon ic-indigo"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <div class="nav-text">المحاسبة المالية</div>
+      </a>
+    </li>
   </ul>
 
   <p class="sb-section">المالية</p>
