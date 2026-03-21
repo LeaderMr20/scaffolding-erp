@@ -3,43 +3,10 @@ include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
-// ── Ensure tables exist ────────────────────────────
-$conn->query("CREATE TABLE IF NOT EXISTS settings (
-    name VARCHAR(100) PRIMARY KEY,
-    value TEXT
-)");
-
-$conn->query("CREATE TABLE IF NOT EXISTS expense_categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    sort_order INT DEFAULT 0
-)");
-
-// Add notes column to expenses if missing
-$conn->query("ALTER TABLE expenses ADD COLUMN IF NOT EXISTS notes TEXT");
-$conn->query("ALTER TABLE expenses ADD COLUMN IF NOT EXISTS category_id INT DEFAULT NULL");
-
-// ── Seed default categories once ──────────────────
-$catsSetting = $conn->query("SELECT value FROM settings WHERE name='cats_v2'")->fetch_assoc();
-if (!$catsSetting) {
-    $defaultCats = [
-        'إيجار',
-        'أجور ورواتب',
-        'نثريات',
-        'مصاريف تشغيل',
-        'كهرباء وماء',
-        'وقود ومواصلات',
-        'مشتريات ومواد',
-        'صيانة وإصلاح',
-        'اتصالات وإنترنت',
-        'أخرى',
-    ];
-    foreach ($defaultCats as $i => $name) {
-        $n = $conn->real_escape_string($name);
-        $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$n', " . ($i+1) . ")");
-    }
-    $conn->query("INSERT INTO settings(name,value) VALUES('cats_v2','1') ON DUPLICATE KEY UPDATE value='1'");
-}
+// ── Add missing columns to expenses if needed ─────
+// Use try/catch via error suppression — IF NOT EXISTS not supported in older MySQL
+@$conn->query("ALTER TABLE expenses ADD COLUMN notes TEXT");
+@$conn->query("ALTER TABLE expenses ADD COLUMN category_id INT DEFAULT NULL");
 
 // ── Manage Categories ──────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_cat') {
