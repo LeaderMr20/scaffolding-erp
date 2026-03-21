@@ -3,16 +3,12 @@ include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
-// ── Add missing columns to expenses if needed ─────
-// Use try/catch via error suppression — IF NOT EXISTS not supported in older MySQL
-@$conn->query("ALTER TABLE expenses ADD COLUMN notes TEXT");
-@$conn->query("ALTER TABLE expenses ADD COLUMN category_id INT DEFAULT NULL");
-
 // ── Manage Categories ──────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_cat') {
     $name = $conn->real_escape_string(trim($_POST['cat_name']));
     if ($name) {
-        $ord = (int)$conn->query("SELECT COALESCE(MAX(sort_order),0)+1 v FROM expense_categories")->fetch_assoc()['v'];
+        $ro = $conn->query("SELECT COALESCE(MAX(sort_order),0)+1 v FROM expense_categories");
+        $ord = $ro ? (int)$ro->fetch_assoc()['v'] : 1;
         $conn->query("INSERT INTO expense_categories(name, sort_order) VALUES('$name', $ord)");
     }
     header('Location: index.php?tab=cats');
@@ -86,16 +82,24 @@ $expenses = $conn->query("
     $where
     ORDER BY e.expense_date DESC, e.id DESC
 ");
-$totalMonth = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m")->fetch_assoc()['s'];
-$totalAll   = (float)$conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses")->fetch_assoc()['s'];
-$countMonth = (int)$conn->query("SELECT COUNT(*) c FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m")->fetch_assoc()['c'];
+if (!$expenses) $expenses = $conn->query("SELECT * FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m ORDER BY expense_date DESC, id DESC");
 
-$categories = $conn->query("SELECT * FROM expense_categories ORDER BY sort_order, name");
+$r1 = $conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m");
+$totalMonth = $r1 ? (float)$r1->fetch_assoc()['s'] : 0;
+
+$r2 = $conn->query("SELECT COALESCE(SUM(amount),0) s FROM expenses");
+$totalAll = $r2 ? (float)$r2->fetch_assoc()['s'] : 0;
+
+$r3 = $conn->query("SELECT COUNT(*) c FROM expenses WHERE YEAR(expense_date)=$y AND MONTH(expense_date)=$m");
+$countMonth = $r3 ? (int)$r3->fetch_assoc()['c'] : 0;
+
+$r4 = $conn->query("SELECT * FROM expense_categories ORDER BY sort_order, name");
 $cats = [];
-while ($c = $categories->fetch_assoc()) $cats[] = $c;
+if ($r4) while ($c = $r4->fetch_assoc()) $cats[] = $c;
 
 // Category totals for chart
-$catTotals = $conn->query("
+$catData = [];
+$r5 = $conn->query("
     SELECT ec.name, COALESCE(SUM(e.amount),0) total
     FROM expense_categories ec
     LEFT JOIN expenses e ON e.category_id = ec.id
@@ -104,8 +108,7 @@ $catTotals = $conn->query("
     HAVING total > 0
     ORDER BY total DESC
 ");
-$catData = [];
-while ($r = $catTotals->fetch_assoc()) $catData[] = $r;
+if ($r5) while ($r = $r5->fetch_assoc()) $catData[] = $r;
 
 $activeTab = $_GET['tab'] ?? 'list';
 

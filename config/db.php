@@ -80,11 +80,19 @@ $conn->query("CREATE TABLE IF NOT EXISTS employees (
 
 $conn->query("CREATE TABLE IF NOT EXISTS expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT DEFAULT NULL,
     title VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    notes TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
     amount DECIMAL(10,2),
-    expense_date DATE,
-    description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+    expense_date DATE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+// Add columns to existing expenses table if missing
+$expCols = [];
+$cr = $conn->query("SHOW COLUMNS FROM expenses");
+if ($cr) { while ($col = $cr->fetch_assoc()) $expCols[] = $col['Field']; }
+if (!in_array('category_id', $expCols)) $conn->query("ALTER TABLE expenses ADD COLUMN category_id INT DEFAULT NULL");
+if (!in_array('notes',       $expCols)) $conn->query("ALTER TABLE expenses ADD COLUMN notes TEXT");
 
 $conn->query("CREATE TABLE IF NOT EXISTS invoices (
     id INT AUTO_INCREMENT PRIMARY KEY,
