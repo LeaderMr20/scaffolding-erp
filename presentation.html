@@ -2,12 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام إدارة السقالات ERP — وثيقة المواصفات الفنية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>نظام إدارة السقالات ERP — وثيقة المواصفات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-/* ═══ RESET & BASE ═══════════════════════════════ */
+/* ═══ RESET ══════════════════════════════════════ */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 :root {
   --navy:   #0b162c;
@@ -20,9 +20,10 @@
   --purple: #7c3aed;
   --text:   #1e293b;
   --muted:  #64748b;
-  --bg:     #f8fafc;
+  --bg:     #f1f5f9;
   --white:  #ffffff;
   --border: #e2e8f0;
+  --radius: 14px;
 }
 html { scroll-behavior: smooth; }
 body {
@@ -33,359 +34,385 @@ body {
   line-height: 1.7;
 }
 
-/* ═══ PAGE LAYOUT ════════════════════════════════ */
-@page { size: A4; margin: 0; }
+/* ═══ PRINT ══════════════════════════════════════ */
+@page { size: A4; margin: 10mm; }
 @media print {
-  .no-print { display: none !important; }
-  .page { page-break-after: always; page-break-inside: avoid; }
-  .page:last-child { page-break-after: auto; }
-  body { background: #fff; }
+  .no-print { display:none!important; }
+  .section { break-inside: avoid; page-break-inside: avoid; }
+  body { background:#fff; font-size:11px; }
+  .page { box-shadow:none!important; margin:0!important; border-radius:0!important; }
 }
 
-/* ═══ FLOATING NAV ═══════════════════════════════ */
-.float-nav {
-  position: fixed; top: 24px; left: 24px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 8px;
+/* ═══ PRINT BUTTON ═══════════════════════════════ */
+.print-btn {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; no-print;
+  background: linear-gradient(135deg,#1d4ed8,#2563eb);
+  color:#fff; border:none; border-radius:100px;
+  padding:14px 32px; font-family:'Cairo',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer;
+  box-shadow: 0 8px 24px rgba(37,99,235,.4);
+  display:flex; align-items:center; gap:8px;
+  white-space:nowrap;
 }
-.float-nav button, .float-nav a {
-  background: var(--blue2); color: #fff; border: none;
-  border-radius: 10px; padding: 10px 20px;
-  font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700;
-  cursor: pointer; text-decoration: none; text-align: center;
-  box-shadow: 0 4px 14px rgba(37,99,235,.35);
-  transition: opacity .2s;
-}
-.float-nav button:hover, .float-nav a:hover { opacity: .85; }
 
-/* ═══ PAGE WRAPPER ═══════════════════════════════ */
+/* ═══ LAYOUT ══════════════════════════════════════ */
 .page {
-  width: 210mm;
-  min-height: 297mm;
-  margin: 0 auto 32px;
+  max-width: 900px;
+  margin: 0 auto 24px;
   background: #fff;
-  box-shadow: 0 4px 40px rgba(0,0,0,.12);
-  position: relative;
+  border-radius: 20px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.10);
   overflow: hidden;
 }
 
-/* ═══════════════════════════════════════════════
-   PAGE 1 — COVER
-════════════════════════════════════════════════ */
-.cover {
-  background: var(--navy);
-  min-height: 297mm;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 0;
-}
-.cover-top {
-  background: linear-gradient(135deg, #0b162c 0%, #1e3a6e 60%, #1d4ed8 100%);
-  padding: 64px 56px 80px;
-  position: relative;
-  flex: 1;
-}
-.cover-top::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-}
-.cover-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 100px; padding: 8px 20px;
-  color: var(--sky); font-size: 12px; font-weight: 700;
-  letter-spacing: 1px; margin-bottom: 40px;
-  position: relative;
-}
-.cover-title {
-  font-size: 48px; font-weight: 900; color: #fff;
-  line-height: 1.15; margin-bottom: 12px; position: relative;
-}
-.cover-title span { color: var(--sky); }
-.cover-sub {
-  font-size: 20px; color: #93c5fd; font-weight: 500;
-  margin-bottom: 48px; position: relative;
-}
-.cover-tags {
-  display: flex; flex-wrap: wrap; gap: 10px; position: relative;
-}
-.cover-tag {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 8px; padding: 7px 16px;
-  color: #e2e8f0; font-size: 12px; font-weight: 600;
-}
-.cover-bottom {
-  background: rgba(0,0,0,.3);
-  padding: 32px 56px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.cover-logo {
-  display: flex; align-items: center; gap: 14px;
-}
-.cover-logo-icon {
-  width: 52px; height: 52px; border-radius: 14px;
-  background: linear-gradient(135deg, var(--blue2), var(--sky));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; color: #fff;
-}
-.cover-logo-text { color: #fff; }
-.cover-logo-text strong { font-size: 18px; font-weight: 900; display: block; }
-.cover-logo-text span { font-size: 12px; color: #93c5fd; }
-.cover-meta { text-align: left; color: #94a3b8; font-size: 12px; line-height: 1.8; }
-.cover-meta strong { color: #fff; font-size: 13px; }
-
-/* ═══════════════════════════════════════════════
-   SHARED COMPONENTS
-════════════════════════════════════════════════ */
-.p-content { padding: 52px 56px; }
-.section-label {
-  font-size: 11px; font-weight: 800; letter-spacing: 2px;
-  color: var(--blue2); text-transform: uppercase;
-  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
-}
-.section-label::after {
-  content: ''; flex: 1; height: 2px;
-  background: linear-gradient(to left, transparent, var(--blue2));
-  border-radius: 2px;
-}
-.section-title {
-  font-size: 28px; font-weight: 900; color: var(--navy);
-  margin-bottom: 8px; line-height: 1.3;
-}
-.section-title span { color: var(--blue2); }
-.section-desc {
-  color: var(--muted); font-size: 14px; margin-bottom: 36px;
-  max-width: 560px;
-}
-
-/* Stats row */
-.stats-row {
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
-  margin-bottom: 36px;
-}
-.stat-box {
-  background: var(--navy); border-radius: 14px;
-  padding: 20px 16px; text-align: center; color: #fff;
-}
-.stat-box .val { font-size: 32px; font-weight: 900; line-height: 1; }
-.stat-box .lbl { font-size: 11px; color: #93c5fd; margin-top: 4px; }
-.stat-box .ico { font-size: 20px; margin-bottom: 6px; }
-
-/* Module cards */
-.mod-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-.mod-card {
-  border: 2px solid var(--border); border-radius: 14px;
-  padding: 18px; transition: border-color .2s;
-}
-.mod-card:hover { border-color: var(--blue2); }
-.mod-icon {
-  width: 42px; height: 42px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; margin-bottom: 10px;
-}
-.mod-name { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
-.mod-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
-
-/* Feature list */
-.feat-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.feat-list li {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px 16px; border-radius: 10px;
-  background: var(--bg); border: 1px solid var(--border);
-}
-.feat-list .fi { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.feat-list .ft { font-weight: 700; font-size: 13px; color: var(--navy); }
-.feat-list .fd { font-size: 12px; color: var(--muted); }
-
-/* Tech stack */
-.tech-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
-.tech-card {
-  border-radius: 12px; padding: 20px;
-  border: 1px solid var(--border);
-  display: flex; align-items: flex-start; gap: 14px;
-}
-.tech-icon { font-size: 28px; flex-shrink: 0; }
-.tech-name { font-weight: 800; font-size: 14px; color: var(--navy); margin-bottom: 4px; }
-.tech-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
-
-/* Accounting */
-.acc-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
-.acc-card {
-  border-radius: 14px; padding: 22px;
-  border: 2px solid var(--border);
-}
-.acc-card .ac-icon { font-size: 28px; margin-bottom: 10px; }
-.acc-card .ac-title { font-weight: 900; font-size: 15px; color: var(--navy); margin-bottom: 8px; }
-.acc-card ul { list-style: none; }
-.acc-card ul li {
-  font-size: 12px; color: var(--muted); padding: 4px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 6px;
-}
-.acc-card ul li:last-child { border-bottom: none; }
-.acc-card ul li::before {
-  content: '✓'; color: var(--green);
-  font-weight: 900; font-size: 11px; flex-shrink: 0;
-}
-
-/* Divider */
-.divider {
-  height: 3px;
-  background: linear-gradient(to left, var(--blue2), var(--sky), var(--blue2));
-  border-radius: 2px; margin: 32px 0;
-}
-
-/* Page header strip */
+/* ═══ PAGE STRIP ══════════════════════════════════ */
 .page-strip {
   background: var(--navy);
-  padding: 20px 56px;
-  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 28px;
+  display: flex; justify-content:space-between; align-items:center;
 }
-.page-strip .ps-title { color: #fff; font-weight: 800; font-size: 16px; }
+.page-strip .ps-title { color:#fff; font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; }
 .page-strip .ps-num {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--blue2); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 14px;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--blue2); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:13px; flex-shrink:0;
 }
 
-/* Page footer strip */
-.page-footer {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--bg); border-top: 2px solid var(--border);
-  padding: 14px 56px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 11px; color: var(--muted);
+/* ═══ CONTENT PADDING ════════════════════════════ */
+.p-content { padding: 32px 28px; }
+
+/* ═══ SECTION LABELS ═════════════════════════════ */
+.sec-label {
+  font-size:11px; font-weight:800; letter-spacing:2px;
+  color:var(--blue2); text-transform:uppercase;
+  margin-bottom:6px; display:flex; align-items:center; gap:8px;
 }
-.page-footer strong { color: var(--navy); }
-
-/* Highlight box */
-.hl-box {
-  border-radius: 14px; padding: 20px 24px;
-  display: flex; align-items: flex-start; gap: 14px;
-  margin-bottom: 20px;
+.sec-label::after {
+  content:''; flex:1; height:2px;
+  background:linear-gradient(to left,transparent,var(--blue2));
 }
-.hl-box .hb-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-.hl-box .hb-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
-.hl-box .hb-text { font-size: 12px; line-height: 1.7; }
+.sec-title {
+  font-size:clamp(20px,4vw,28px); font-weight:900;
+  color:var(--navy); margin-bottom:6px; line-height:1.25;
+}
+.sec-title span { color:var(--blue2); }
+.sec-desc { color:var(--muted); font-size:13px; margin-bottom:28px; }
 
-/* Two column */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+/* ═══ COVER ═══════════════════════════════════════ */
+.cover {
+  background: linear-gradient(160deg, #070d1a 0%, #0b162c 40%, #1e3a6e 75%, #1d4ed8 100%);
+  padding: 48px 28px 36px;
+  position: relative; overflow: hidden;
+}
+.cover::before {
+  content:'';
+  position:absolute; inset:0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+.cover-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+  border-radius:100px; padding:6px 16px;
+  color:var(--sky); font-size:11px; font-weight:700; letter-spacing:1px;
+  margin-bottom:28px; position:relative;
+}
+.cover-title {
+  font-size: clamp(32px,7vw,52px);
+  font-weight:900; color:#fff; line-height:1.15;
+  margin-bottom:10px; position:relative;
+}
+.cover-title span { color:var(--sky); }
+.cover-sub { font-size:clamp(14px,3vw,18px); color:#93c5fd; font-weight:500; margin-bottom:28px; position:relative; }
+.cover-tags {
+  display:flex; flex-wrap:wrap; gap:8px; position:relative; margin-bottom:36px;
+}
+.cover-tag {
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; padding:6px 14px;
+  color:#e2e8f0; font-size:11px; font-weight:600;
+}
+.cover-bottom {
+  background:rgba(0,0,0,.3); border-radius:14px;
+  padding:20px; position:relative;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.cover-logo-icon {
+  width:48px; height:48px; border-radius:12px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue2),var(--sky));
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; color:#fff;
+}
+.cover-logo-text { color:#fff; flex:1; }
+.cover-logo-text strong { font-size:16px; font-weight:900; display:block; }
+.cover-logo-text span { font-size:11px; color:#93c5fd; }
+.cover-meta { color:#94a3b8; font-size:11px; line-height:1.9; }
+.cover-meta strong { color:#fff; }
 
-/* Security list */
+/* ═══ STATS ROW ══════════════════════════════════ */
+.stats-row {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px;
+}
+.stat-box {
+  background:var(--navy); border-radius:12px;
+  padding:16px 10px; text-align:center; color:#fff;
+}
+.stat-box .sv { font-size:clamp(22px,5vw,30px); font-weight:900; line-height:1; }
+.stat-box .si { font-size:18px; margin-bottom:4px; }
+.stat-box .sl { font-size:10px; color:#93c5fd; margin-top:3px; }
+
+/* ═══ MODULE GRID ════════════════════════════════ */
+.mod-grid {
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap:12px;
+}
+.mod-card {
+  border:2px solid var(--border); border-radius:12px; padding:16px;
+}
+.mod-icon {
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; margin-bottom:8px; flex-shrink:0;
+}
+.mod-name { font-size:13px; font-weight:800; color:var(--navy); margin-bottom:3px; }
+.mod-desc { font-size:11px; color:var(--muted); line-height:1.6; }
+
+/* ═══ FEATURE LIST ═══════════════════════════════ */
+.feat-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+.feat-list li {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:11px 14px; border-radius:10px;
+  background:var(--bg); border:1px solid var(--border);
+}
+.feat-list .fi { font-size:18px; flex-shrink:0; }
+.feat-list .ft { font-weight:700; font-size:12px; color:var(--navy); }
+.feat-list .fd { font-size:11px; color:var(--muted); }
+
+/* ═══ SECURITY ═══════════════════════════════════ */
 .sec-item {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 14px; border-radius: 10px; margin-bottom: 10px;
-  background: #f0fdf4; border: 1px solid #bbf7d0;
+  display:flex; align-items:flex-start; gap:10px;
+  padding:12px; border-radius:10px; margin-bottom:8px;
+  background:#f0fdf4; border:1px solid #bbf7d0;
 }
-.sec-item .si-icon { font-size: 20px; flex-shrink: 0; color: var(--green); }
-.sec-item .si-title { font-weight: 700; font-size: 13px; color: #065f46; }
-.sec-item .si-text { font-size: 11px; color: #047857; }
+.sec-item .si-icon { font-size:18px; color:var(--green); flex-shrink:0; }
+.sec-item .si-title { font-weight:700; font-size:12px; color:#065f46; }
+.sec-item .si-text  { font-size:11px; color:#047857; }
 
-/* Summary table */
-.sum-table { width: 100%; border-collapse: collapse; }
+/* ═══ ACC CARDS ══════════════════════════════════ */
+.acc-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.acc-card { border-radius:12px; padding:18px; border:2px solid var(--border); }
+.acc-card .ac-icon  { font-size:24px; margin-bottom:8px; }
+.acc-card .ac-title { font-weight:900; font-size:13px; color:var(--navy); margin-bottom:8px; }
+.acc-card ul { list-style:none; }
+.acc-card ul li {
+  font-size:11px; color:var(--muted); padding:4px 0;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:6px;
+}
+.acc-card ul li:last-child { border-bottom:none; }
+.acc-card ul li::before { content:'✓'; color:var(--green); font-weight:900; font-size:10px; flex-shrink:0; }
+
+/* ═══ TECH GRID ══════════════════════════════════ */
+.tech-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.tech-card {
+  border-radius:12px; padding:18px;
+  border:1px solid var(--border);
+  display:flex; align-items:flex-start; gap:12px;
+}
+.tech-icon { font-size:26px; flex-shrink:0; }
+.tech-name { font-weight:800; font-size:13px; color:var(--navy); margin-bottom:4px; }
+.tech-desc { font-size:11px; color:var(--muted); line-height:1.6; }
+
+/* ═══ TABLE ══════════════════════════════════════ */
+.sum-table { width:100%; border-collapse:collapse; font-size:11px; }
 .sum-table th {
-  background: var(--navy); color: #fff;
-  padding: 12px 16px; font-size: 12px; text-align: right;
+  background:var(--navy); color:#fff;
+  padding:10px 12px; text-align:right; white-space:nowrap;
 }
-.sum-table td {
-  padding: 11px 16px; font-size: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.sum-table tr:nth-child(even) td { background: var(--bg); }
-.sum-table .badge {
-  display: inline-block; border-radius: 100px;
-  padding: 3px 10px; font-size: 11px; font-weight: 700;
-}
-.badge-green { background: #dcfce7; color: #15803d; }
-.badge-blue  { background: #dbeafe; color: #1d4ed8; }
-.badge-gold  { background: #fef3c7; color: #92400e; }
+.sum-table td { padding:9px 12px; border-bottom:1px solid var(--border); }
+.sum-table tr:nth-child(even) td { background:var(--bg); }
+.badge { display:inline-block; border-radius:100px; padding:2px 10px; font-size:10px; font-weight:700; }
+.badge-green { background:#dcfce7; color:#15803d; }
+.badge-blue  { background:#dbeafe; color:#1d4ed8; }
 
-/* ═══ CONCLUSION PAGE ════════════════════════════ */
+/* ═══ HL BOX ══════════════════════════════════════ */
+.hl-box {
+  border-radius:12px; padding:18px;
+  display:flex; align-items:flex-start; gap:12px; margin-bottom:16px;
+}
+.hb-icon  { font-size:22px; flex-shrink:0; }
+.hb-title { font-weight:800; font-size:13px; margin-bottom:4px; }
+.hb-text  { font-size:11px; line-height:1.7; }
+
+/* ═══ DIVIDER ════════════════════════════════════ */
+.divider {
+  height:3px; margin:24px 0;
+  background:linear-gradient(to left,var(--blue2),var(--sky),var(--blue2));
+  border-radius:2px;
+}
+
+/* ═══ TWO COL ════════════════════════════════════ */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+/* ═══ PAGE FOOTER ════════════════════════════════ */
+.page-footer {
+  background:var(--bg); border-top:2px solid var(--border);
+  padding:12px 28px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:10px; color:var(--muted);
+}
+.page-footer strong { color:var(--navy); }
+
+/* ═══ CONCLUSION ══════════════════════════════════ */
 .conclusion {
-  background: linear-gradient(160deg, var(--navy) 0%, #1e3a6e 50%, #1d4ed8 100%);
-  min-height: 297mm;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  text-align: center; padding: 64px 56px;
-  color: #fff; position: relative;
+  background:linear-gradient(160deg,var(--navy) 0%,#1e3a6e 50%,#1d4ed8 100%);
+  padding:48px 28px;
+  display:flex; flex-direction:column; align-items:center;
+  text-align:center; color:#fff; position:relative; overflow:hidden;
 }
 .conclusion::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(56,189,248,.1) 0%, transparent 70%);
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 40%,rgba(56,189,248,.12) 0%,transparent 65%);
 }
-.con-big { font-size: 56px; font-weight: 900; line-height: 1.15; position: relative; margin-bottom: 16px; }
-.con-big span { color: var(--sky); }
-.con-sub { font-size: 18px; color: #93c5fd; margin-bottom: 48px; position: relative; }
-.con-cards {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-  width: 100%; max-width: 640px; position: relative; margin-bottom: 48px;
-}
-.con-card {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 14px; padding: 20px;
-}
-.con-card .cc-val { font-size: 28px; font-weight: 900; color: var(--sky); }
-.con-card .cc-lbl { font-size: 11px; color: #93c5fd; margin-top: 2px; }
+.con-big { font-size:clamp(32px,8vw,52px); font-weight:900; line-height:1.2; position:relative; margin-bottom:12px; }
+.con-big span { color:var(--sky); }
+.con-sub { font-size:clamp(13px,3vw,17px); color:#93c5fd; margin-bottom:36px; position:relative; }
+.con-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:480px; position:relative; margin-bottom:32px; }
+.con-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:18px 10px; }
+.con-card .cc-val { font-size:clamp(22px,5vw,28px); font-weight:900; color:var(--sky); }
+.con-card .cc-lbl { font-size:10px; color:#93c5fd; margin-top:2px; }
 .con-contact {
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 14px; padding: 24px 40px;
-  position: relative;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  border-radius:14px; padding:22px 28px; position:relative; width:100%; max-width:480px;
 }
-.con-contact p { color: #cbd5e1; font-size: 13px; margin-bottom: 6px; }
-.con-contact strong { color: #fff; font-size: 15px; }
+.con-contact p { color:#cbd5e1; font-size:12px; margin-bottom:4px; }
+.con-contact strong { color:#fff; font-size:14px; word-break:break-all; }
+.con-sep { margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,.1); }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — TABLET (≤768px)
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  body { font-size:13px; }
+  .p-content { padding:22px 18px; }
+  .page-strip { padding:14px 18px; }
+  .page-strip .ps-title { font-size:13px; }
+  .page-footer { padding:10px 18px; flex-direction:column; gap:2px; text-align:center; }
+
+  .stats-row { grid-template-columns:repeat(2,1fr); gap:10px; }
+
+  .mod-grid { grid-template-columns:repeat(2,1fr); }
+
+  .acc-grid { grid-template-columns:1fr; }
+
+  .tech-grid { grid-template-columns:1fr; }
+
+  .two-col { grid-template-columns:1fr; }
+
+  .sum-table { display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+  .con-cards { grid-template-columns:repeat(3,1fr); }
+
+  .cover { padding:36px 18px 28px; }
+  .cover-title { font-size:clamp(28px,8vw,42px); }
+
+  .print-btn { font-size:14px; padding:12px 24px; }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤480px)
+════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .p-content { padding:18px 14px; }
+  .page-strip { padding:12px 14px; }
+  .page-footer { padding:10px 14px; }
+
+  .stats-row { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .stat-box { padding:12px 8px; }
+  .stat-box .sv { font-size:22px; }
+
+  .mod-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .mod-card { padding:12px; }
+  .mod-icon { width:34px; height:34px; font-size:16px; }
+  .mod-name { font-size:11px; }
+  .mod-desc { font-size:10px; }
+
+  .acc-card { padding:14px; }
+  .tech-card { padding:14px; }
+
+  .cover { padding:28px 14px 22px; }
+  .cover-tags { gap:6px; }
+  .cover-tag { font-size:10px; padding:5px 10px; }
+  .cover-bottom { padding:14px; gap:10px; }
+  .cover-logo-icon { width:40px; height:40px; font-size:20px; }
+  .cover-logo-text strong { font-size:14px; }
+
+  .sec-title { font-size:20px; }
+
+  .con-cards { gap:8px; }
+  .con-contact { padding:16px; }
+  .con-contact strong { font-size:12px; }
+
+  .print-btn { padding:12px 20px; font-size:13px; bottom:16px; }
+
+  .hl-box { padding:14px; gap:10px; }
+  .hb-title { font-size:12px; }
+
+  .feat-list li { padding:9px 12px; gap:8px; }
+
+  .two-col { gap:14px; }
+
+  .sec-item { padding:10px; }
+}
+
+/* ═══ SMALL PHONES (≤360px) ══════════════════════ */
+@media (max-width: 360px) {
+  .mod-grid { grid-template-columns:1fr; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .con-cards { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
 
-<!-- ─── FLOATING CONTROLS ─────────────────────── -->
-<div class="float-nav no-print">
-  <button onclick="window.print()"><i class="bi bi-printer"></i> طباعة / PDF</button>
-</div>
+<!-- ─── PRINT BUTTON ─────────────────────────── -->
+<button class="print-btn no-print" onclick="window.print()">
+  <i class="bi bi-file-earmark-pdf-fill"></i> تصدير PDF / طباعة
+</button>
+
+<div style="height:16px"></div>
 
 
 <!-- ═══════════════════════════════════════════════
      PAGE 1 — COVER
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="cover">
-    <div class="cover-top">
-      <div class="cover-badge">
-        <i class="bi bi-shield-check-fill"></i>
-        وثيقة المواصفات الفنية — النسخة 2.0
-      </div>
-      <div class="cover-title">
-        نظام إدارة<br><span>السقالات</span> المتكامل
-      </div>
-      <div class="cover-sub">ERP System — Enterprise Resource Planning</div>
-      <div class="cover-tags">
-        <span class="cover-tag"><i class="bi bi-globe me-1"></i>Web Application</span>
-        <span class="cover-tag"><i class="bi bi-phone me-1"></i>PWA — يعمل على الجوال</span>
-        <span class="cover-tag"><i class="bi bi-cloud-check me-1"></i>Cloud Hosted</span>
-        <span class="cover-tag"><i class="bi bi-translate me-1"></i>Arabic RTL</span>
-        <span class="cover-tag"><i class="bi bi-receipt me-1"></i>فاتورة إلكترونية</span>
-        <span class="cover-tag"><i class="bi bi-journal-bookmark me-1"></i>محاسبة مالية</span>
-      </div>
+    <div class="cover-badge">
+      <i class="bi bi-shield-check-fill"></i>
+      وثيقة المواصفات الفنية — الإصدار 2.0
+    </div>
+    <div class="cover-title">نظام إدارة<br><span>السقالات</span> المتكامل</div>
+    <div class="cover-sub">ERP System — Enterprise Resource Planning</div>
+    <div class="cover-tags">
+      <span class="cover-tag"><i class="bi bi-globe"></i> Web App</span>
+      <span class="cover-tag"><i class="bi bi-phone"></i> PWA جوال</span>
+      <span class="cover-tag"><i class="bi bi-cloud-check"></i> Cloud</span>
+      <span class="cover-tag"><i class="bi bi-translate"></i> Arabic RTL</span>
+      <span class="cover-tag"><i class="bi bi-receipt"></i> فاتورة إلكترونية</span>
+      <span class="cover-tag"><i class="bi bi-journal-bookmark"></i> محاسبة مالية</span>
     </div>
     <div class="cover-bottom">
-      <div class="cover-logo">
-        <div class="cover-logo-icon"><i class="bi bi-building"></i></div>
-        <div class="cover-logo-text">
-          <strong>مؤسسة الجود للسقالات</strong>
-          <span>نظام ERP متكامل لإدارة الأعمال</span>
-        </div>
+      <div class="cover-logo-icon"><i class="bi bi-building"></i></div>
+      <div class="cover-logo-text">
+        <strong>مؤسسة الجود للسقالات</strong>
+        <span>نظام ERP متكامل لإدارة الأعمال</span>
       </div>
       <div class="cover-meta">
-        <strong>وثيقة سرية — للاستخدام الداخلي</strong><br>
-        الإصدار: 2.0<br>
-        تاريخ الإصدار: مارس 2026<br>
-        اللغة: العربية
+        <strong>مارس 2026 · الإصدار 2.0</strong><br>
+        وثيقة سرية — للاستخدام الداخلي
       </div>
     </div>
   </div>
@@ -393,91 +420,75 @@ body {
 
 
 <!-- ═══════════════════════════════════════════════
-     PAGE 2 — OVERVIEW + STATS
+     PAGE 2 — OVERVIEW
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="page-strip">
-    <span class="ps-title"><i class="bi bi-speedometer2" style="color:#38bdf8"></i> &nbsp;نظرة عامة على النظام</span>
+    <span class="ps-title"><i class="bi bi-speedometer2" style="color:#38bdf8"></i>نظرة عامة</span>
     <span class="ps-num">2</span>
   </div>
   <div class="p-content">
 
-    <div class="section-label"><i class="bi bi-info-circle"></i> Overview</div>
-    <div class="section-title">ما هو <span>النظام</span>؟</div>
-    <div class="section-desc">
-      منصة إدارة أعمال متكاملة مصممة خصيصاً لشركات تأجير وبيع السقالات.
-      يغطي كامل دورة الحياة التجارية من العميل حتى الفاتورة الإلكترونية والتقارير المحاسبية.
-    </div>
+    <div class="sec-label"><i class="bi bi-info-circle"></i> Overview</div>
+    <div class="sec-title">ما هو <span>النظام</span>؟</div>
+    <div class="sec-desc">منصة إدارة أعمال متكاملة مصممة لشركات تأجير وبيع السقالات — تغطي كامل دورة الحياة التجارية من العميل حتى الفاتورة والتقارير المالية</div>
 
     <div class="stats-row">
       <div class="stat-box">
-        <div class="ico" style="color:#38bdf8"><i class="bi bi-grid-3x3-gap-fill"></i></div>
-        <div class="val" style="color:#38bdf8">12</div>
-        <div class="lbl">وحدة وظيفية</div>
+        <div class="si" style="color:#38bdf8"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+        <div class="sv" style="color:#38bdf8">12</div>
+        <div class="sl">وحدة وظيفية</div>
       </div>
       <div class="stat-box">
-        <div class="ico" style="color:#10b981"><i class="bi bi-code-slash"></i></div>
-        <div class="val" style="color:#10b981">5,000+</div>
-        <div class="lbl">سطر برمجي</div>
+        <div class="si" style="color:#10b981"><i class="bi bi-code-slash"></i></div>
+        <div class="sv" style="color:#10b981">5k+</div>
+        <div class="sl">سطر برمجي</div>
       </div>
       <div class="stat-box">
-        <div class="ico" style="color:#f59e0b"><i class="bi bi-table"></i></div>
-        <div class="val" style="color:#f59e0b">14</div>
-        <div class="lbl">جدول قاعدة بيانات</div>
+        <div class="si" style="color:#f59e0b"><i class="bi bi-table"></i></div>
+        <div class="sv" style="color:#f59e0b">14</div>
+        <div class="sl">جدول بيانات</div>
       </div>
       <div class="stat-box">
-        <div class="ico" style="color:#a78bfa"><i class="bi bi-lightning-charge-fill"></i></div>
-        <div class="val" style="color:#a78bfa">100%</div>
-        <div class="lbl">استجابة فورية</div>
+        <div class="si" style="color:#a78bfa"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div class="sv" style="color:#a78bfa">100%</div>
+        <div class="sl">تلقائي</div>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="section-label"><i class="bi bi-layers"></i> Architecture</div>
-    <div class="section-title" style="font-size:20px;margin-bottom:20px">بنية النظام</div>
+    <div class="sec-label"><i class="bi bi-layers"></i> Architecture</div>
+    <div class="sec-title" style="font-size:clamp(17px,4vw,22px);margin-bottom:16px">بنية <span>النظام</span></div>
 
-    <div class="two-col" style="gap:16px">
-      <div class="hl-box" style="background:#eff6ff;border:2px solid #bfdbfe">
-        <div class="hb-icon" style="color:#1d4ed8"><i class="bi bi-display"></i></div>
-        <div>
-          <div class="hb-title" style="color:#1e3a8a">الواجهة الأمامية (Frontend)</div>
-          <div class="hb-text" style="color:#1d4ed8">
-            Bootstrap 5 RTL · Cairo Font · Bootstrap Icons<br>
-            تصميم متجاوب لجميع الشاشات<br>
-            PWA — قابل للتثبيت كتطبيق
-          </div>
-        </div>
+    <div class="hl-box" style="background:#eff6ff;border:2px solid #bfdbfe;margin-bottom:12px">
+      <span class="hb-icon" style="color:#1d4ed8"><i class="bi bi-display"></i></span>
+      <div>
+        <div class="hb-title" style="color:#1e3a8a">الواجهة الأمامية (Frontend)</div>
+        <div class="hb-text" style="color:#1d4ed8">Bootstrap 5 RTL · Cairo Font · Bootstrap Icons · تصميم متجاوب · PWA قابل للتثبيت</div>
       </div>
-      <div class="hl-box" style="background:#f0fdf4;border:2px solid #bbf7d0">
-        <div class="hb-icon" style="color:#059669"><i class="bi bi-server"></i></div>
-        <div>
-          <div class="hb-title" style="color:#065f46">الخادم (Backend)</div>
-          <div class="hb-text" style="color:#047857">
-            PHP 8.1 · MySQL 8.0<br>
-            معالجة آمنة للبيانات وحماية SQL<br>
-            نشر تلقائي عبر GitHub Actions + FTP
-          </div>
-        </div>
+    </div>
+
+    <div class="hl-box" style="background:#f0fdf4;border:2px solid #bbf7d0;margin-bottom:12px">
+      <span class="hb-icon" style="color:#059669"><i class="bi bi-server"></i></span>
+      <div>
+        <div class="hb-title" style="color:#065f46">الخادم (Backend)</div>
+        <div class="hb-text" style="color:#047857">PHP 8.1 · MySQL 8.0 · معالجة آمنة للبيانات · حماية SQL Injection</div>
       </div>
     </div>
 
     <div class="hl-box" style="background:#fdf4ff;border:2px solid #e9d5ff;margin-bottom:0">
-      <div class="hb-icon" style="color:#7c3aed"><i class="bi bi-cloud-upload-fill"></i></div>
+      <span class="hb-icon" style="color:#7c3aed"><i class="bi bi-cloud-upload-fill"></i></span>
       <div>
-        <div class="hb-title" style="color:#581c87">الاستضافة والنشر</div>
-        <div class="hb-text" style="color:#6d28d9">
-          InfinityFree Cloud Hosting · النطاق: erpmanagement.wuaze.com<br>
-          نشر مستمر: أي تحديث يُرفع تلقائياً خلال 60 ثانية عبر CI/CD Pipeline<br>
-          قاعدة بيانات: sql212.infinityfree.com (MySQL مُشفّر)
-        </div>
+        <div class="hb-title" style="color:#581c87">الاستضافة والنشر (CI/CD)</div>
+        <div class="hb-text" style="color:#6d28d9">InfinityFree Cloud · erpmanagement.wuaze.com · نشر تلقائي عبر GitHub Actions في أقل من 60 ثانية</div>
       </div>
     </div>
 
   </div>
   <div class="page-footer">
     <strong>نظام إدارة السقالات ERP</strong>
-    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+    <span>الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
 
@@ -485,179 +496,157 @@ body {
 <!-- ═══════════════════════════════════════════════
      PAGE 3 — MODULES
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="page-strip">
-    <span class="ps-title"><i class="bi bi-grid-3x3-gap-fill" style="color:#38bdf8"></i> &nbsp;وحدات النظام الوظيفية</span>
+    <span class="ps-title"><i class="bi bi-grid-3x3-gap-fill" style="color:#38bdf8"></i>الوحدات الوظيفية</span>
     <span class="ps-num">3</span>
   </div>
   <div class="p-content">
 
-    <div class="section-label"><i class="bi bi-grid"></i> Modules</div>
-    <div class="section-title">الوحدات <span>الاثنتا عشرة</span></div>
-    <div class="section-desc">كل وحدة مستقلة ومترابطة في آنٍ واحد — البيانات تتدفق تلقائياً بين الوحدات</div>
+    <div class="sec-label"><i class="bi bi-grid"></i> Modules</div>
+    <div class="sec-title">الوحدات <span>الاثنتا عشرة</span></div>
+    <div class="sec-desc">كل وحدة مستقلة ومترابطة — البيانات تتدفق تلقائياً بين جميع الوحدات</div>
 
     <div class="mod-grid">
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#dbeafe;color:#1d4ed8"><i class="bi bi-speedometer2"></i></div>
         <div class="mod-name">لوحة التحكم</div>
-        <div class="mod-desc">إحصائيات فورية وبطاقات ملخص شاملة — نظرة 360° على النشاط التجاري</div>
+        <div class="mod-desc">إحصائيات فورية ونظرة 360° على النشاط</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#dcfce7;color:#15803d"><i class="bi bi-people-fill"></i></div>
-        <div class="mod-name">إدارة العملاء</div>
-        <div class="mod-desc">قاعدة بيانات كاملة للعملاء مع بيانات الاتصال والتاريخ التجاري</div>
+        <div class="mod-name">العملاء</div>
+        <div class="mod-desc">قاعدة بيانات كاملة مع التاريخ التجاري</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#fff7ed;color:#ea580c"><i class="bi bi-box-seam-fill"></i></div>
-        <div class="mod-name">إدارة المعدات</div>
-        <div class="mod-desc">جرد كامل للسقالات والمعدات مع الأسعار والكميات وحالة التوفر</div>
+        <div class="mod-name">المعدات</div>
+        <div class="mod-desc">جرد المعدات والأسعار وحالة التوفر</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#fdf4ff;color:#7c3aed"><i class="bi bi-file-earmark-text-fill"></i></div>
         <div class="mod-name">العقود</div>
-        <div class="mod-desc">إنشاء وإدارة العقود مع حساب تلقائي للإجمالي وتتبع الحالة</div>
+        <div class="mod-desc">إنشاء وإدارة العقود بحساب تلقائي</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#f0fdf4;color:#059669"><i class="bi bi-cash-coin"></i></div>
         <div class="mod-name">المدفوعات</div>
-        <div class="mod-desc">تسجيل الدفعات وربطها بالعقود مع تتبع المبالغ المستحقة والمحصّلة</div>
+        <div class="mod-desc">تسجيل الدفعات وتتبع المبالغ المستحقة</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#fef9c3;color:#ca8a04"><i class="bi bi-receipt-cutoff"></i></div>
-        <div class="mod-name">الفواتير الإلكترونية</div>
-        <div class="mod-desc">فواتير متوافقة مع هيئة الزكاة والدخل مع QR Code مشفّر للتحقق</div>
+        <div class="mod-name">الفواتير</div>
+        <div class="mod-desc">فواتير إلكترونية بـ QR Code للزكاة</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#fef2f2;color:#dc2626"><i class="bi bi-wallet2"></i></div>
         <div class="mod-name">المصروفات</div>
-        <div class="mod-desc">تصنيف وتتبع المصروفات مع 13 فئة قياسية وإحصائيات شهرية مفصّلة</div>
+        <div class="mod-desc">13 فئة قياسية وإحصائيات شهرية</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-person-badge-fill"></i></div>
         <div class="mod-name">الموظفون</div>
-        <div class="mod-desc">بيانات الموظفين والرواتب مع حساب تلقائي في التقارير المالية</div>
+        <div class="mod-desc">بيانات الموظفين والرواتب التلقائية</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-bar-chart-line-fill"></i></div>
         <div class="mod-name">التقارير</div>
-        <div class="mod-desc">تقارير شاملة للأداء والمخزون مع إمكانية الطباعة والتصدير</div>
+        <div class="mod-desc">تقارير شاملة قابلة للطباعة</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#ede9fe;color:#7c3aed"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="mod-name">المحاسبة المالية</div>
-        <div class="mod-desc">أرباح وخسائر، ميزانية عمومية، ميزان مراجعة، شجرة حسابات — تلقائي 100%</div>
+        <div class="mod-name">المحاسبة</div>
+        <div class="mod-desc">أرباح وخسائر وميزانية وميزان مراجعة</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#f0f9ff;color:#0284c7"><i class="bi bi-shield-lock-fill"></i></div>
-        <div class="mod-name">إدارة المستخدمين</div>
-        <div class="mod-desc">أدوار متعددة (مدير / مستخدم) مع تشفير كلمات المرور وتحكم كامل بالصلاحيات</div>
+        <div class="mod-name">المستخدمون</div>
+        <div class="mod-desc">أدوار وصلاحيات متعددة المستويات</div>
       </div>
-
       <div class="mod-card">
         <div class="mod-icon" style="background:#f8fafc;color:#475569"><i class="bi bi-gear-wide-connected"></i></div>
         <div class="mod-name">الإعدادات</div>
-        <div class="mod-desc">بيانات المنشأة، الرقم الضريبي، وميزة إعادة ضبط النظام المحمية بتأكيد مزدوج</div>
+        <div class="mod-desc">بيانات المنشأة وإعادة ضبط النظام</div>
       </div>
-
     </div>
 
   </div>
   <div class="page-footer">
     <strong>نظام إدارة السقالات ERP</strong>
-    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+    <span>الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
 
 
 <!-- ═══════════════════════════════════════════════
-     PAGE 4 — ACCOUNTING MODULE DETAIL
+     PAGE 4 — ACCOUNTING
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="page-strip">
-    <span class="ps-title"><i class="bi bi-journal-bookmark-fill" style="color:#a78bfa"></i> &nbsp;وحدة المحاسبة المالية المتكاملة</span>
+    <span class="ps-title"><i class="bi bi-journal-bookmark-fill" style="color:#a78bfa"></i>المحاسبة المالية</span>
     <span class="ps-num">4</span>
   </div>
   <div class="p-content">
 
-    <div class="section-label"><i class="bi bi-calculator"></i> Accounting</div>
-    <div class="section-title">محاسبة <span>احترافية</span> تلقائية</div>
-    <div class="section-desc">
-      تسحب البيانات تلقائياً من جميع وحدات النظام وتُنتج قوائم مالية معيارية فورياً دون أي إدخال يدوي
-    </div>
+    <div class="sec-label"><i class="bi bi-calculator"></i> Accounting</div>
+    <div class="sec-title">محاسبة <span>احترافية</span> تلقائية</div>
+    <div class="sec-desc">تسحب البيانات تلقائياً من جميع الوحدات وتُنتج قوائم مالية معيارية دون أي إدخال يدوي</div>
 
     <div class="acc-grid">
-
       <div class="acc-card" style="border-color:#bbf7d0;background:#f0fdf4">
         <div class="ac-icon" style="color:#059669"><i class="bi bi-graph-up-arrow"></i></div>
-        <div class="ac-title" style="color:#065f46">قائمة الأرباح والخسائر</div>
+        <div class="ac-title" style="color:#065f46">أرباح وخسائر</div>
         <ul>
-          <li>إيرادات الفواتير المفعّلة بالفترة</li>
-          <li>تفصيل المصروفات حسب الفئة</li>
-          <li>الرواتب × عدد أشهر الفترة</li>
+          <li>إيرادات الفواتير المفعّلة</li>
+          <li>تفصيل المصروفات بالفئة</li>
+          <li>الرواتب × أشهر الفترة</li>
           <li>صافي الربح أو الخسارة</li>
           <li>فلتر بالسنة والشهر</li>
         </ul>
       </div>
-
       <div class="acc-card" style="border-color:#bfdbfe;background:#eff6ff">
         <div class="ac-icon" style="color:#1d4ed8"><i class="bi bi-columns-gap"></i></div>
         <div class="ac-title" style="color:#1e3a8a">الميزانية العمومية</div>
         <ul>
-          <li>أصول متداولة (نقد + ذمم مدينة)</li>
-          <li>أصول ثابتة (قيمة المعدات)</li>
-          <li>خصوم وحقوق الملكية</li>
-          <li>رأس المال + الأرباح المحتجزة</li>
+          <li>أصول متداولة (نقد + ذمم)</li>
+          <li>أصول ثابتة (المعدات)</li>
+          <li>رأس المال + الأرباح</li>
           <li>فحص توازن تلقائي</li>
+          <li>معيار IFRS مبسّط</li>
         </ul>
       </div>
-
       <div class="acc-card" style="border-color:#fde68a;background:#fffbeb">
         <div class="ac-icon" style="color:#d97706"><i class="bi bi-list-check"></i></div>
         <div class="ac-title" style="color:#92400e">ميزان المراجعة</div>
         <ul>
-          <li>جميع الحسابات بالمدين والدائن</li>
-          <li>إجمالي الميزان مع فحص التعادل</li>
-          <li>توزيع المصروفات بالنسب المئوية</li>
-          <li>أشرطة تقدم بصرية للمقارنة</li>
-          <li>تصنيف كل حساب (أصل/إيراد/مصروف)</li>
+          <li>جميع الحسابات مدين/دائن</li>
+          <li>فحص تعادل الميزان</li>
+          <li>توزيع بأشرطة نسبية</li>
+          <li>تصنيف كل حساب</li>
+          <li>تحليل المصروفات</li>
         </ul>
       </div>
-
       <div class="acc-card" style="border-color:#ddd6fe;background:#fdf4ff">
         <div class="ac-icon" style="color:#7c3aed"><i class="bi bi-diagram-3-fill"></i></div>
         <div class="ac-title" style="color:#581c87">شجرة الحسابات</div>
         <ul>
-          <li>دليل حسابات قياسي (1000 → 5000)</li>
-          <li>أصول، خصوم، ملكية، إيرادات، مصروفات</li>
-          <li>أرصدة حية مستخرجة من قاعدة البيانات</li>
-          <li>شرح لكل مجموعة حسابات</li>
-          <li>مبني على المعايير المحاسبية الدولية</li>
+          <li>دليل حسابات (1000 → 5000)</li>
+          <li>أصول · خصوم · ملكية</li>
+          <li>إيرادات · مصروفات</li>
+          <li>أرصدة حية من قاعدة البيانات</li>
+          <li>معايير محاسبية دولية</li>
         </ul>
       </div>
-
     </div>
 
     <div class="divider"></div>
 
-    <div class="hl-box" style="background:#0b162c;border:none;border-radius:14px">
-      <div class="hb-icon" style="color:#38bdf8"><i class="bi bi-magic"></i></div>
+    <div class="hl-box" style="background:#0b162c;margin-bottom:0">
+      <span class="hb-icon" style="color:#38bdf8"><i class="bi bi-magic"></i></span>
       <div>
-        <div class="hb-title" style="color:#fff;font-size:16px">صفر تدخل يدوي — 100% تلقائي</div>
+        <div class="hb-title" style="color:#fff;font-size:14px">صفر تدخل يدوي — 100% تلقائي</div>
         <div class="hb-text" style="color:#93c5fd">
-          النظام يسحب الإيرادات من الفواتير · النقدية من الدفعات · المصروفات من سجل المصروفات ·
-          الرواتب من بيانات الموظفين · قيمة الأصول من جدول المعدات.
-          لا حاجة لإدخال أي قيد محاسبي يدوياً.
+          الإيرادات من الفواتير · النقدية من الدفعات · المصروفات من سجلها · الرواتب من الموظفين · الأصول من المعدات. لا قيود يدوية.
         </div>
       </div>
     </div>
@@ -665,121 +654,83 @@ body {
   </div>
   <div class="page-footer">
     <strong>نظام إدارة السقالات ERP</strong>
-    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+    <span>الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
 
 
 <!-- ═══════════════════════════════════════════════
      PAGE 5 — FEATURES & SECURITY
-════════════════════════════════════════════════ */
-<div class="page">
+════════════════════════════════════════════════ -->
+<div class="page section">
   <div class="page-strip">
-    <span class="ps-title"><i class="bi bi-star-fill" style="color:#fbbf24"></i> &nbsp;المميزات والأمان</span>
+    <span class="ps-title"><i class="bi bi-star-fill" style="color:#fbbf24"></i>المميزات والأمان</span>
     <span class="ps-num">5</span>
   </div>
   <div class="p-content">
 
     <div class="two-col">
-      <!-- FEATURES -->
       <div>
-        <div class="section-label"><i class="bi bi-star"></i> Features</div>
-        <div class="section-title" style="font-size:20px;margin-bottom:16px">المميزات <span>الرئيسية</span></div>
-
+        <div class="sec-label"><i class="bi bi-star"></i> Features</div>
+        <div class="sec-title" style="font-size:clamp(17px,4vw,22px);margin-bottom:14px">المميزات <span>الرئيسية</span></div>
         <ul class="feat-list">
           <li>
             <span class="fi" style="color:#f59e0b"><i class="bi bi-phone-fill"></i></span>
-            <div>
-              <div class="ft">تطبيق ويب تقدمي (PWA)</div>
-              <div class="fd">يُثبَّت على الجوال ويعمل كتطبيق أصلي بدون متجر</div>
-            </div>
+            <div><div class="ft">تطبيق PWA للجوال</div><div class="fd">يُثبَّت كتطبيق أصلي بدون متجر تطبيقات</div></div>
           </li>
           <li>
             <span class="fi" style="color:#10b981"><i class="bi bi-qr-code-scan"></i></span>
-            <div>
-              <div class="ft">فاتورة إلكترونية بـ QR Code</div>
-              <div class="fd">متوافق مع متطلبات هيئة الزكاة والدخل والضرائب</div>
-            </div>
+            <div><div class="ft">فاتورة إلكترونية + QR Code</div><div class="fd">متوافقة مع هيئة الزكاة والدخل والضرائب</div></div>
           </li>
           <li>
             <span class="fi" style="color:#2563eb"><i class="bi bi-printer-fill"></i></span>
-            <div>
-              <div class="ft">طباعة احترافية لجميع المستندات</div>
-              <div class="fd">العقود، الفواتير، التقارير، القوائم المالية</div>
-            </div>
+            <div><div class="ft">طباعة احترافية</div><div class="fd">عقود، فواتير، تقارير، قوائم مالية</div></div>
           </li>
           <li>
             <span class="fi" style="color:#7c3aed"><i class="bi bi-funnel-fill"></i></span>
-            <div>
-              <div class="ft">فلاتر وبحث متقدم</div>
-              <div class="fd">تصفية بالتاريخ، الشهر، السنة، الحالة في كل وحدة</div>
-            </div>
+            <div><div class="ft">فلاتر وبحث متقدم</div><div class="fd">تصفية بالتاريخ والشهر والسنة في كل وحدة</div></div>
           </li>
           <li>
             <span class="fi" style="color:#dc2626"><i class="bi bi-arrow-counterclockwise"></i></span>
-            <div>
-              <div class="ft">إعادة ضبط النظام المحمية</div>
-              <div class="fd">مسح بيانات التشغيل مع الاحتفاظ بالإعدادات والمعدات</div>
-            </div>
+            <div><div class="ft">إعادة ضبط محمية</div><div class="fd">مسح بيانات التشغيل مع حفظ الإعدادات</div></div>
           </li>
           <li>
-            <span class="fi" style="color:#0891b2"><i class="bi bi-graph-up-arrow"></i></span>
-            <div>
-              <div class="ft">لوحة تحكم ديناميكية</div>
-              <div class="fd">إحصائيات فورية وتنبيهات استحقاق العقود تلقائياً</div>
-            </div>
+            <span class="fi" style="color:#0891b2"><i class="bi bi-bell-fill"></i></span>
+            <div><div class="ft">تنبيهات استحقاق</div><div class="fd">تنبيه تلقائي للعقود القريبة من الانتهاء</div></div>
           </li>
         </ul>
       </div>
 
-      <!-- SECURITY -->
       <div>
-        <div class="section-label"><i class="bi bi-shield-check"></i> Security</div>
-        <div class="section-title" style="font-size:20px;margin-bottom:16px">الأمان <span>والحماية</span></div>
-
+        <div class="sec-label"><i class="bi bi-shield-check"></i> Security</div>
+        <div class="sec-title" style="font-size:clamp(17px,4vw,22px);margin-bottom:14px">الأمان <span>والحماية</span></div>
         <div class="sec-item">
           <span class="si-icon"><i class="bi bi-key-fill"></i></span>
-          <div>
-            <div class="si-title">تشفير كلمات المرور</div>
-            <div class="si-text">bcrypt hashing — لا تُخزَّن كلمات المرور بصياغة قابلة للقراءة</div>
-          </div>
+          <div><div class="si-title">تشفير bcrypt للكلمات السرية</div><div class="si-text">لا تُخزَّن كلمات المرور بصياغة قابلة للقراءة</div></div>
         </div>
         <div class="sec-item">
           <span class="si-icon"><i class="bi bi-person-check-fill"></i></span>
-          <div>
-            <div class="si-title">نظام جلسات آمن</div>
-            <div class="si-text">Session-based authentication مع انتهاء تلقائي وتحقق في كل صفحة</div>
-          </div>
+          <div><div class="si-title">جلسات آمنة</div><div class="si-text">Session authentication مع انتهاء تلقائي</div></div>
         </div>
         <div class="sec-item">
           <span class="si-icon"><i class="bi bi-database-lock"></i></span>
-          <div>
-            <div class="si-title">حماية SQL Injection</div>
-            <div class="si-text">جميع المدخلات تمر بـ real_escape_string قبل أي استعلام</div>
-          </div>
+          <div><div class="si-title">حماية SQL Injection</div><div class="si-text">جميع المدخلات تمر بـ escape قبل أي استعلام</div></div>
         </div>
         <div class="sec-item">
           <span class="si-icon"><i class="bi bi-shield-shaded"></i></span>
-          <div>
-            <div class="si-title">نظام الصلاحيات</div>
-            <div class="si-text">أدوار (Admin / User) مع منع الوصول للصفحات المقيدة تلقائياً</div>
-          </div>
+          <div><div class="si-title">نظام الصلاحيات</div><div class="si-text">Admin / User مع حماية كل صفحة تلقائياً</div></div>
         </div>
         <div class="sec-item">
-          <span class="si-icon"><i class="bi bi-cloud-check-fill"></i></span>
-          <div>
-            <div class="si-title">HTTPS مشفّر</div>
-            <div class="si-text">جميع البيانات تنتقل عبر SSL/TLS مشفّر بالكامل</div>
-          </div>
+          <span class="si-icon"><i class="bi bi-lock-fill"></i></span>
+          <div><div class="si-title">HTTPS / SSL مشفّر</div><div class="si-text">جميع البيانات محمية من الاعتراض</div></div>
         </div>
-
       </div>
     </div>
 
   </div>
   <div class="page-footer">
     <strong>نظام إدارة السقالات ERP</strong>
-    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+    <span>الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
 
@@ -787,120 +738,77 @@ body {
 <!-- ═══════════════════════════════════════════════
      PAGE 6 — TECH STACK
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="page-strip">
-    <span class="ps-title"><i class="bi bi-cpu-fill" style="color:#34d399"></i> &nbsp;التقنيات والبنية التحتية</span>
+    <span class="ps-title"><i class="bi bi-cpu-fill" style="color:#34d399"></i>التقنيات والبنية التحتية</span>
     <span class="ps-num">6</span>
   </div>
   <div class="p-content">
 
-    <div class="section-label"><i class="bi bi-code-square"></i> Tech Stack</div>
-    <div class="section-title">المكدس <span>التقني</span></div>
-    <div class="section-desc">تقنيات حديثة ومثبتة في بيئات الإنتاج العالمية</div>
+    <div class="sec-label"><i class="bi bi-code-square"></i> Tech Stack</div>
+    <div class="sec-title">المكدس <span>التقني</span></div>
+    <div class="sec-desc">تقنيات حديثة ومثبتة في بيئات الإنتاج العالمية</div>
 
-    <div class="tech-grid" style="margin-bottom:28px">
-
+    <div class="tech-grid" style="margin-bottom:24px">
       <div class="tech-card" style="background:#fff7ed;border-color:#fed7aa">
         <span class="tech-icon">🐘</span>
-        <div>
-          <div class="tech-name">PHP 8.1</div>
-          <div class="tech-desc">
-            الخادم الخلفي الرئيسي · معالجة الطلبات وقواعد البيانات والمصادقة.
-            يعتمد على PHP الحديث مع دعم كامل للـ OOP والدوال المساعدة.
-          </div>
-        </div>
+        <div><div class="tech-name">PHP 8.1</div><div class="tech-desc">الخادم الرئيسي · معالجة الطلبات وقواعد البيانات والمصادقة بأمان كامل</div></div>
       </div>
-
       <div class="tech-card" style="background:#f0fdf4;border-color:#bbf7d0">
         <span class="tech-icon">🐬</span>
-        <div>
-          <div class="tech-name">MySQL 8.0</div>
-          <div class="tech-desc">
-            قاعدة البيانات الرئيسية · 14 جدول مترابط بعلاقات FK.
-            ترميز UTF-8mb4 للعربية بشكل كامل وصحيح.
-          </div>
-        </div>
+        <div><div class="tech-name">MySQL 8.0</div><div class="tech-desc">14 جدول مترابط · UTF-8mb4 للعربية الكاملة · علاقات FK محكمة</div></div>
       </div>
-
       <div class="tech-card" style="background:#eff6ff;border-color:#bfdbfe">
         <span class="tech-icon" style="font-size:22px">🅱️</span>
-        <div>
-          <div class="tech-name">Bootstrap 5 RTL</div>
-          <div class="tech-desc">
-            إطار CSS الرائد · دعم RTL كامل للعربية.
-            شبكة استجابة تعمل على الجوال والتابلت والكمبيوتر.
-          </div>
-        </div>
+        <div><div class="tech-name">Bootstrap 5 RTL</div><div class="tech-desc">دعم RTL كامل للعربية · استجابة كاملة جوال/تابلت/كمبيوتر</div></div>
       </div>
-
       <div class="tech-card" style="background:#fdf4ff;border-color:#e9d5ff">
         <span class="tech-icon">⚡</span>
-        <div>
-          <div class="tech-name">PWA — Progressive Web App</div>
-          <div class="tech-desc">
-            Service Worker + Web Manifest · يُثبَّت على الجوال.
-            يعمل على iOS وAndroid كتطبيق أصلي بدون متجر تطبيقات.
-          </div>
-        </div>
+        <div><div class="tech-name">PWA</div><div class="tech-desc">Service Worker · يُثبَّت على iOS وAndroid كتطبيق أصلي</div></div>
       </div>
-
       <div class="tech-card" style="background:#f0fdf4;border-color:#bbf7d0">
         <span class="tech-icon">🔄</span>
-        <div>
-          <div class="tech-name">GitHub Actions CI/CD</div>
-          <div class="tech-desc">
-            نشر تلقائي عند كل تحديث · FTP Deploy Action.
-            دورة النشر الكاملة في أقل من 60 ثانية تلقائياً.
-          </div>
-        </div>
+        <div><div class="tech-name">GitHub Actions CI/CD</div><div class="tech-desc">نشر تلقائي عند كل commit · دورة نشر كاملة أقل من 60 ثانية</div></div>
       </div>
-
       <div class="tech-card" style="background:#fff9f0;border-color:#fde68a">
         <span class="tech-icon">🔒</span>
-        <div>
-          <div class="tech-name">SSL/TLS + HTTPS</div>
-          <div class="tech-desc">
-            اتصال مشفّر بالكامل · شهادة SSL مجانية.
-            جميع البيانات المنقولة محمية من الاعتراض.
-          </div>
-        </div>
+        <div><div class="tech-name">SSL/TLS + HTTPS</div><div class="tech-desc">شهادة SSL · جميع البيانات مشفّرة أثناء النقل</div></div>
       </div>
-
     </div>
 
     <div class="divider"></div>
 
-    <div class="section-label"><i class="bi bi-database"></i> Database Schema</div>
-    <div class="section-title" style="font-size:20px;margin-bottom:16px">هيكل قاعدة البيانات</div>
+    <div class="sec-label"><i class="bi bi-database"></i> Database</div>
+    <div class="sec-title" style="font-size:clamp(17px,4vw,22px);margin-bottom:14px">هيكل <span>قاعدة البيانات</span></div>
 
-    <table class="sum-table">
-      <thead>
-        <tr>
-          <th>اسم الجدول</th>
-          <th>الغرض</th>
-          <th>الحقول الرئيسية</th>
-          <th>الحالة</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>clients</td><td>بيانات العملاء</td><td>name, phone, address</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>equipment</td><td>المعدات والسقالات</td><td>name, quantity, price_day, status</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>contracts</td><td>عقود الإيجار</td><td>client_id, total, start/end_date</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>contract_items</td><td>بنود العقد</td><td>contract_id, equipment_id, qty, price</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>invoices</td><td>الفواتير الإلكترونية</td><td>invoice_number, total, status</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>payments</td><td>الدفعات</td><td>contract_id, amount, method</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>expenses</td><td>المصروفات</td><td>category_id, amount, notes, date</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>expense_categories</td><td>فئات المصروفات</td><td>name, sort_order</td><td><span class="badge badge-blue">إعداد</span></td></tr>
-        <tr><td>employees</td><td>الموظفون</td><td>name, salary, position</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>users</td><td>مستخدمو النظام</td><td>username, password_hash, role</td><td><span class="badge badge-green">نشط</span></td></tr>
-        <tr><td>settings</td><td>إعدادات النظام</td><td>setting_key, setting_value</td><td><span class="badge badge-blue">إعداد</span></td></tr>
-      </tbody>
-    </table>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--border)">
+      <table class="sum-table">
+        <thead>
+          <tr>
+            <th>الجدول</th>
+            <th>الغرض</th>
+            <th>الحقول الرئيسية</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>clients</code></td><td>العملاء</td><td>name, phone, address</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>equipment</code></td><td>المعدات</td><td>name, quantity, price_day</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>contracts</code></td><td>العقود</td><td>client_id, total, dates</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>invoices</code></td><td>الفواتير</td><td>invoice_number, total, status</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>payments</code></td><td>الدفعات</td><td>contract_id, amount, method</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>expenses</code></td><td>المصروفات</td><td>category_id, amount, notes</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>employees</code></td><td>الموظفون</td><td>name, salary, position</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>users</code></td><td>المستخدمون</td><td>username, password_hash, role</td><td><span class="badge badge-green">نشط</span></td></tr>
+          <tr><td><code>settings</code></td><td>الإعدادات</td><td>setting_key, setting_value</td><td><span class="badge badge-blue">إعداد</span></td></tr>
+        </tbody>
+      </table>
+    </div>
 
   </div>
   <div class="page-footer">
     <strong>نظام إدارة السقالات ERP</strong>
-    <span>وثيقة سرية — الإصدار 2.0 — مارس 2026</span>
+    <span>الإصدار 2.0 — مارس 2026</span>
   </div>
 </div>
 
@@ -908,50 +816,43 @@ body {
 <!-- ═══════════════════════════════════════════════
      PAGE 7 — CONCLUSION
 ════════════════════════════════════════════════ -->
-<div class="page">
+<div class="page section">
   <div class="conclusion">
-    <div style="position:relative;width:100%">
+    <div style="margin-bottom:14px;position:relative">
+      <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:7px 18px;color:#38bdf8;font-size:11px;font-weight:700;letter-spacing:1px">
+        <i class="bi bi-check-circle-fill"></i> جاهز للتشغيل الفوري
+      </span>
+    </div>
+    <div class="con-big">النظام <span>جاهز</span><br>ومُشغَّل الآن</div>
+    <div class="con-sub">يعمل على الإنترنت · متاح 24/7 · لا يحتاج تثبيتاً</div>
 
-      <div style="margin-bottom:12px">
-        <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:8px 20px;color:#38bdf8;font-size:12px;font-weight:700;letter-spacing:1px">
-          <i class="bi bi-check-circle-fill"></i> جاهز للتشغيل الفوري
-        </span>
+    <div class="con-cards">
+      <div class="con-card">
+        <div class="cc-val">12</div>
+        <div class="cc-lbl">وحدة وظيفية</div>
       </div>
+      <div class="con-card">
+        <div class="cc-val">100%</div>
+        <div class="cc-lbl">تلقائي</div>
+      </div>
+      <div class="con-card">
+        <div class="cc-val">PWA</div>
+        <div class="cc-lbl">يعمل على الجوال</div>
+      </div>
+    </div>
 
-      <div class="con-big">
-        النظام <span>جاهز</span><br>ومُشغَّل الآن
+    <div class="con-contact">
+      <p>🌐 الرابط المباشر</p>
+      <strong>https://erpmanagement.wuaze.com</strong>
+      <div class="con-sep">
+        <p>بيانات الدخول التجريبية</p>
+        <strong>المستخدم: admin &nbsp;·&nbsp; كلمة المرور: admin123</strong>
       </div>
-      <div class="con-sub">
-        يعمل على الإنترنت · متاح 24/7 · لا يحتاج تثبيتاً
-      </div>
-
-      <div class="con-cards">
-        <div class="con-card">
-          <div class="cc-val">12</div>
-          <div class="cc-lbl">وحدة وظيفية</div>
-        </div>
-        <div class="con-card">
-          <div class="cc-val">100%</div>
-          <div class="cc-lbl">تلقائي</div>
-        </div>
-        <div class="con-card">
-          <div class="cc-val">PWA</div>
-          <div class="cc-lbl">يعمل على الجوال</div>
-        </div>
-      </div>
-
-      <div class="con-contact">
-        <p>🌐 الرابط المباشر للنظام</p>
-        <strong>https://erpmanagement.wuaze.com</strong>
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)">
-          <p style="margin-bottom:4px">بيانات الدخول التجريبية</p>
-          <strong>المستخدم: admin &nbsp;|&nbsp; كلمة المرور: admin123</strong>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
+
+<div style="height:80px"></div>
 
 </body>
 </html>
