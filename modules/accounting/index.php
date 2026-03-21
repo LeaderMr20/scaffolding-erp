@@ -1,16 +1,19 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// Disable mysqli strict exceptions — allow queries to return false on error
+mysqli_report(MYSQLI_REPORT_OFF);
+
 include '../../config/db.php';
 include '../../config/auth.php';
 requireLogin();
 
 // ── Helper: safe query fetch ───────────────────────
-function qval($conn, $sql, $col = 'v') {
-    $r = $conn->query($sql);
-    if (!$r) return 0;
-    $row = $r->fetch_assoc();
-    return $row[$col] ?? 0;
+if (!function_exists('qval')) {
+    function qval($conn, $sql, $col = 'v') {
+        $r = $conn->query($sql);
+        if (!$r) return 0;
+        $row = $r->fetch_assoc();
+        return isset($row[$col]) ? (float)$row[$col] : 0;
+    }
 }
 
 // ── Period filter ──────────────────────────────────
@@ -59,17 +62,13 @@ $ar = max(0, $revenueAll - $cashAll);
 $expenses    = (float)qval($conn,"SELECT COALESCE(SUM(amount),0) v FROM expenses WHERE expense_date BETWEEN '$dateFrom' AND '$dateTo'");
 $expensesAll = (float)qval($conn,"SELECT COALESCE(SUM(amount),0) v FROM expenses");
 
-// Salaries — try with status column, fallback without
-$salQ = $conn->query("SELECT COALESCE(SUM(salary),0) v FROM employees WHERE status='active'");
-if (!$salQ) $salQ = $conn->query("SELECT COALESCE(SUM(salary),0) v FROM employees");
-$monthlySalary = $salQ ? (float)($salQ->fetch_assoc()['v'] ?? 0) : 0;
+// Salaries — all employees (no status column dependency)
+$monthlySalary = (float)qval($conn, "SELECT COALESCE(SUM(salary),0) v FROM employees");
 $salaries      = $monthlySalary * $months;
 $salariesAll   = $monthlySalary * 12;
 
 // Employee count
-$empQ = $conn->query("SELECT COUNT(*) v FROM employees WHERE status='active'");
-if (!$empQ) $empQ = $conn->query("SELECT COUNT(*) v FROM employees");
-$empCount = $empQ ? (int)($empQ->fetch_assoc()['v'] ?? 0) : 0;
+$empCount = (int)qval($conn, "SELECT COUNT(*) v FROM employees", 'v');
 
 // Equipment value
 $equipmentValue = (float)qval($conn,"SELECT COALESCE(SUM(quantity * price_day * 30),0) v FROM equipment");
